@@ -20,4 +20,16 @@ public class TokenFactory(int line = 1)
 
     public void SetLine(int line) => _line = line;
     public void NextLine() => _line++;
+
+    public Token FromChar(char c)
+    {
+        return c switch
+        {
+            '+' => Plus(),
+            '-' => Minus(),
+            '*' => Star(),
+            '/' => Slash(),
+            _ => throw new ArgumentException($"Unknown token to create from '{c}'")
+        };
+    }
 }

@@ -22,13 +22,16 @@ public class Scanner(string source)
     /// </remarks>
     public Token NextToken()
     {
+        if (AtEnd())
+            return _tokenFactory.Eof();
+        
         SkipWhitespace();
-
-        _start = _current;
 
         if (AtEnd())
             return _tokenFactory.Eof();
 
+        _start = _current;
+        
         var c = Advance();
 
         if (IsHobbleDigit(c))

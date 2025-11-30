@@ -9,7 +9,8 @@ public class ScannerTests
     [InlineData("-", TokenType.Minus)]
     [InlineData("*", TokenType.Star)]
     [InlineData("/", TokenType.Slash)]
-    public void NextToken_Operators_ReturnsToken(string lexeme, TokenType type)
+    [InlineData("", TokenType.Eof)]
+    public void NextToken_NonValueTokenTypes_ReturnsToken(string lexeme, TokenType type)
     {
         var scanner = new Scanner(lexeme);
         var expectedToken = new Token(lexeme, type);
@@ -60,6 +61,7 @@ public class ScannerTests
     [Theory]
     [InlineData("\"Hello, World!\"", "Hello, World!")]
     [InlineData("\"First Line.\nSecond Line.\"", "First Line.\nSecond Line.")]
+    [InlineData("\"\"", "")]
     public void NextToken_String_ReturnsToken(string lexeme, string value)
     {
         NextToken_ValueTypes_ReturnToken(lexeme, TokenType.String, value);

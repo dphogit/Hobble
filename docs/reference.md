@@ -34,7 +34,7 @@ by the [operator precedence table](#operator-precedence). We can see that as we 
 expressions, the precedence is increasing.
 
 ```ebnf
-expression = additive
+expression = additive ;
 
 additive = multiplicative ( ( "+" | "-" ) multiplicative )* ;
 
@@ -50,9 +50,9 @@ The lexical grammar groups a stream of characters (string) into tokens for downs
 ```ebnf
 NUMBER = DIGIT+ ( "." DIGIT+ )? ;
 
-STRING = " \" <any character except \"> \" "
+STRING = " \" <any character except \"> \" " ;
 
-ALPHA = "a" | ... | "z" | "A" | ... | "Z" | UNDER
+ALPHA = "a" | ... | "z" | "A" | ... | "Z" | UNDER ;
 
 UNDER = "_" ;
 
