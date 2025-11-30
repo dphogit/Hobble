@@ -12,6 +12,7 @@ public class TreeWalkInterpreter
         {
             BinaryExpr binaryExpr => EvaluateBinaryExpr(binaryExpr),
             LiteralExpr literalExpr => literalExpr.Value,
+            UnaryExpr unaryExpr => EvaluateUnaryExpr(unaryExpr),
             _ => throw new ArgumentException($"Invalid expression type {expression.GetType()}")
         };
     }
@@ -60,5 +61,20 @@ public class TreeWalkInterpreter
             if (!a.IsNumber() || !b.IsNumber())
                 throw new RuntimeError("Operands must both be Numbers.");
         }
+    }
+
+    private HobbleValue EvaluateUnaryExpr(UnaryExpr unaryExpr)
+    {
+        var op = unaryExpr.Operator;
+        var right = Evaluate(unaryExpr.Right);
+
+        return op.Type switch
+        {
+            TokenType.Minus => right.IsNumber()
+                ? HobbleValue.Number(-right.AsNumber())
+                : throw new RuntimeError("Negation operand must be a Number."),
+            
+            _ => throw new ArgumentException($"Invalid unary expression type '{unaryExpr.GetType()}'")
+        };
     }
 }

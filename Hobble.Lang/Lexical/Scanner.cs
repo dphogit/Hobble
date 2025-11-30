@@ -47,6 +47,10 @@ public class Scanner(string source)
                 return _tokenFactory.Star();
             case '/':
                 return _tokenFactory.Slash();
+            case '(':
+                return _tokenFactory.LeftParen();
+            case ')':
+                return _tokenFactory.RightParen();
 
             case '"':
                 return String();

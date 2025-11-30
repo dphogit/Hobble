@@ -25,6 +25,20 @@ public class TreeWalkInterpreterTests
         Assert.Equal(expectedResult, result);
     }
 
+    [Theory]
+    [InlineData(1)]
+    [InlineData(-1)]
+    public void Evaluate_NegativeSignInFrontOfNumber_EvaluatesToNumericNegation(int value)
+    {
+        var interpreter = new TreeWalkInterpreter();
+        var expr = new UnaryExpr(_tokenFactory.Minus(), LiteralExpr.Number(value));
+        
+        var result = interpreter.Evaluate(expr);
+        
+        var expectedResult = HobbleValue.Number(-value);
+        Assert.Equal(expectedResult, result);
+    }
+    
     [Fact]
     public void Evaluate_MixedPrecedence_EvaluatesCorrectly()
     {
@@ -42,6 +56,22 @@ public class TreeWalkInterpreterTests
     }
 
     [Fact]
+    public void Evaluate_RaisedPrecedenceFromParenthesis_EvaluatesInCorrectOrder()
+    {
+        var interpreter = new TreeWalkInterpreter();
+        
+        // 6 / (3 - 1) = 3
+        var left = LiteralExpr.Number(6);
+        var right = new BinaryExpr(LiteralExpr.Number(3), _tokenFactory.Slash(), LiteralExpr.Number(1));
+        var expr  = new BinaryExpr(left, _tokenFactory.Minus(), right);
+        
+        var result = interpreter.Evaluate(expr);
+        
+        var expectedResult = HobbleValue.Number(3);
+        Assert.Equal(expectedResult, result);
+    }
+
+    [Fact]
     public void Evaluate_AddTwoStrings_Concatenates()
     {
         var interpreter = new TreeWalkInterpreter();
@@ -51,6 +81,15 @@ public class TreeWalkInterpreterTests
         
         var expectedResult = HobbleValue.String("Hello, World!");
         Assert.Equal(expectedResult, result);
+    }
+
+    [Fact]
+    public void Evaluate_NegateNonNumber_ThrowsRuntimeError()
+    {
+        var interpreter = new TreeWalkInterpreter();
+        var expr = new UnaryExpr(_tokenFactory.Minus(), LiteralExpr.String("1"));
+        
+        Assert.Throws<RuntimeError>(() => interpreter.Evaluate(expr));
     }
 
     [Fact]

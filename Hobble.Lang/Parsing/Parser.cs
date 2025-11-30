@@ -45,7 +45,19 @@ public class Parser(IReporter reporter)
 
     private Expr Multiplicative()
     {
-        return LeftAssociativeBinaryOperator(Primary, TokenType.Star, TokenType.Slash);
+        return LeftAssociativeBinaryOperator(Unary, TokenType.Star, TokenType.Slash);
+    }
+
+    private Expr Unary()
+    {
+        if (Match(TokenType.Minus))
+        {
+            var op = _prev;
+            var right = Unary();
+            return new UnaryExpr(op, right);
+        }
+        
+        return Primary();
     }
 
     private Expr Primary()
@@ -55,6 +67,13 @@ public class Parser(IReporter reporter)
 
         if (Match(TokenType.String))
             return LiteralExpr.String(_prev.GetStringValue());
+
+        if (Match(TokenType.LeftParen))
+        {
+            var expr = Expression();
+            Consume(TokenType.RightParen, "Expected closing ')' at end of expression.");
+            return expr;
+        }
 
         throw CreateParseError("Expected expression.");
     }

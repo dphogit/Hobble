@@ -27,6 +27,29 @@ public class ParserTests
     }
 
     [Fact]
+    public void ParseExpression_NegateNumber_ReturnsUnaryExpr()
+    {
+        var parser = new Parser();
+        
+        var expr = parser.ParseExpression("-1");
+
+        var expectedExpr = new UnaryExpr(_tokenFactory.Minus(), LiteralExpr.Number(1));
+        Assert.Equal(expectedExpr, expr);
+    }
+
+    [Fact]
+    public void ParseExpression_NegateNegativeNumber_ReturnsNestedUnaryExpr()
+    {
+        var parser = new Parser();
+        
+        var expr = parser.ParseExpression("--1");
+        
+        var nestedExpr = new UnaryExpr(_tokenFactory.Minus(), LiteralExpr.Number(1));
+        var expectedExpr = new UnaryExpr(_tokenFactory.Minus(), nestedExpr);
+        Assert.Equal(expectedExpr, expr);
+    }
+
+    [Fact]
     public void ParseExpression_MultiplePrecedence_ReturnsCorrectPrecedenceExpr()
     {
         var parser = new Parser();
@@ -36,7 +59,19 @@ public class ParserTests
         var expectedLeft = LiteralExpr.Number(1);
         var expectedRight = new BinaryExpr(LiteralExpr.Number(2), _tokenFactory.Star(), LiteralExpr.Number(3));
         var expectedExpr = new BinaryExpr(expectedLeft, _tokenFactory.Plus(), expectedRight);
+        Assert.Equal(expectedExpr, expr);
+    }
 
+    [Fact]
+    public void ParseExpression_ContainsParenthesis_ReturnsCorrectPrecedenceExpr()
+    {
+        var parser = new Parser();
+        
+        var expr = parser.ParseExpression("(1 + 2) * 3");
+        
+        var expectedLeft = new BinaryExpr(LiteralExpr.Number(1), _tokenFactory.Plus(), LiteralExpr.Number(2));
+        var expectedRight = LiteralExpr.Number(3);
+        var expectedExpr = new BinaryExpr(expectedLeft, _tokenFactory.Star(), expectedRight);
         Assert.Equal(expectedExpr, expr);
     }
 
@@ -50,7 +85,6 @@ public class ParserTests
         var expectedLeft = new BinaryExpr(LiteralExpr.Number(1), _tokenFactory.Plus(), LiteralExpr.Number(2));
         var expectedRight = LiteralExpr.Number(3);
         var expectedExpr = new BinaryExpr(expectedLeft, _tokenFactory.Plus(), expectedRight);
-
         Assert.Equal(expectedExpr, expr);
     }
 }

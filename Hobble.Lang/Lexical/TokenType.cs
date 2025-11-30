@@ -6,6 +6,8 @@ public enum TokenType
     Minus,
     Star,
     Slash,
+    LeftParen,
+    RightParen,
     
     String,
     Number,

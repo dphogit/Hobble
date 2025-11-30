@@ -12,3 +12,5 @@ public record LiteralExpr(HobbleValue Value) : Expr
     public static LiteralExpr Number(decimal value) => new (HobbleValue.Number(value));
     public static LiteralExpr String(string value) => new (HobbleValue.String(value));
 }
+
+public record UnaryExpr(Token Operator, Expr Right) : Expr;

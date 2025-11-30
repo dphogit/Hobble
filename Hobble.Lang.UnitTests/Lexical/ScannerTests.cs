@@ -9,6 +9,8 @@ public class ScannerTests
     [InlineData("-", TokenType.Minus)]
     [InlineData("*", TokenType.Star)]
     [InlineData("/", TokenType.Slash)]
+    [InlineData("(", TokenType.LeftParen)]
+    [InlineData(")", TokenType.RightParen)]
     [InlineData("", TokenType.Eof)]
     public void NextToken_NonValueTokenTypes_ReturnsToken(string lexeme, TokenType type)
     {

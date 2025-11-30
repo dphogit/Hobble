@@ -11,6 +11,8 @@ public class TokenFactory(int line = 1)
     public Token Minus() => Create("-", TokenType.Minus);
     public Token Star() => Create("*", TokenType.Star);
     public Token Slash() => Create("/", TokenType.Slash);
+    public Token LeftParen() => Create("(", TokenType.LeftParen);
+    public Token RightParen() => Create(")", TokenType.RightParen);
     public Token Eof() => Create("", TokenType.Eof);
 
     public Token Error(string message) => Create(message, TokenType.Error);

@@ -3,6 +3,24 @@
 This document provides an informal reference to the Hobble Programming Language. It can be referred to for syntax,
 idioms and how the language works.
 
+<!-- TOC -->
+* [Hobble Programming Language Reference](#hobble-programming-language-reference)
+  * [Types](#types)
+  * [Grammar](#grammar)
+    * [Syntax Grammar](#syntax-grammar)
+      * [Expressions](#expressions)
+    * [Lexical Grammar](#lexical-grammar)
+      * [Comments](#comments)
+  * [Operators](#operators)
+    * [Arithmetic Operators](#arithmetic-operators)
+      * [Addition Operator +](#addition-operator-)
+      * [Subtraction Operator -](#subtraction-operator--)
+      * [Multiplication Operator *](#multiplication-operator-)
+      * [Division Operator /](#division-operator-)
+      * [Unary Minus Operator](#unary-minus-operator)
+    * [Operator Precedence](#operator-precedence)
+<!-- TOC -->
+
 ## Types
 
 Hobble has the following built-in value types:
@@ -34,13 +52,17 @@ by the [operator precedence table](#operator-precedence). We can see that as we 
 expressions, the precedence is increasing.
 
 ```ebnf
-expression = additive ;
+expression     = additive ;
 
-additive = multiplicative ( ( "+" | "-" ) multiplicative )* ;
+additive       = multiplicative ( ( "+" | "-" ) multiplicative )* ;
 
-multiplicative = primary ( ( "*" | "/" ) primary )* ;
+multiplicative = unary ( ( "*" | "/" ) unary )* ;
 
-primary = NUMBER | STRING ;
+unary          = ( "-" unary ) | primary ;
+
+primary        = NUMBER | STRING | grouping ;
+
+grouping       = "(" expression ")" ;
 ```
 
 ### Lexical Grammar
@@ -52,11 +74,11 @@ NUMBER = DIGIT+ ( "." DIGIT+ )? ;
 
 STRING = " \" <any character except \"> \" " ;
 
-ALPHA = "a" | ... | "z" | "A" | ... | "Z" | UNDER ;
+ALPHA  = "a" | ... | "z" | "A" | ... | "Z" | UNDER ;
 
-UNDER = "_" ;
+UNDER  = "_" ;
 
-DIGIT = "0" | ... | "9" ;
+DIGIT  = "0" | ... | "9" ;
 ```
 
 #### Comments
@@ -87,7 +109,7 @@ Operators allow the user to perform basic operations with the built-in value typ
 
 ### Arithmetic Operators
 
-These operators perform arithmetic with Number type operands. These operators are categorized as either **unary** (one
+These operators perform arithmetic with Number type operands. These operators are categorised as either **unary** (one
 operand) or **binary** (two operands).
 
 #### Addition Operator +
@@ -96,26 +118,61 @@ The addition operator `+` computes the sum of its operands. It can also be used 
 concatenate two string operands, if they are both String types. Mixing operand types is not allowed for the addition
 operator, unlike other dynamically typed languages. i.e. Adding a String and Number will result in an error.
 
+```hob
+print 1 + 2;             // output: 3
+print "foo" + "bar";     // output: "foobar"
+print 1 + "1";           // RuntimeError
+```
+
 #### Subtraction Operator -
 
 The subtraction operator `-` subtracts the left operand by the right operand.
+
+```hob
+print 2 - 1;    // output: 1
+```
 
 #### Multiplication Operator *
 
 The multiplication operator `*` computes the product of its operands.
 
+```hob
+print 2 * 3;    // output: 6
+```
+
 #### Division Operator /
 
 The division operator `*` divides the left operands by the right operand.
 
+```hob
+print 2 / 1;    // output: 2
+print 2 / 0;    // DivideByZeroError
+```
+
+#### Unary Minus Operator
+
+The unary `-` operator computes the numeric negation of it's single operand.
+
+```hob
+print -2;       // output: -2
+print -(-2);    // output: 2
+```
+
 ### Operator Precedence
 
 With expressions that contain multiple operators, the operators with higher precedence are evaluated before
-the operators with lower precedence.
-
-The following table contains the operators in descending precedence.
+the operators with lower precedence. The following table contains the operators in descending precedence.
 
 | Precedence | Operators | Name           |
 |:----------:|:----------|----------------|
-|     1      | * /       | Multiplicative |
-|     2      | + -       | Additive       |
+|     1      | -x        | Unary          |
+|     2      | x*y x/y   | Multiplicative |
+|     3      | x+y x-y   | Additive       |
+
+Parentheses can be used to control the precedence of how an expression evaluates. Enclose an expression with
+parentheses to evaluate the enclosing expression before any other evaluation happens outside the parentheses.
+
+```hob
+print 6 * 2 + 1     // output: 13
+print 6 * (2 + 1)   // output: 18
+```
