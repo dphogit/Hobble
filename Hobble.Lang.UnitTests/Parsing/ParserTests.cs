@@ -8,11 +8,17 @@ public class ParserTests
     private readonly TokenFactory _tokenFactory = new();
     
     [Theory]
-    [InlineData("1 + 2", 1, '+', 2)]
-    [InlineData("3 - 4", 3, '-', 4)]
-    [InlineData("5 * 6", 5, '*', 6)]
-    [InlineData("7 / 8", 7, '/', 8)]
-    public void ParseExpression_BinaryOperations_ReturnsBinaryExpr(string source, int left, char op, int right)
+    [InlineData("1 + 2", 1, "+", 2)]
+    [InlineData("3 - 4", 3, "-", 4)]
+    [InlineData("5 * 6", 5, "*", 6)]
+    [InlineData("7 / 8", 7, "/", 8)]
+    [InlineData("9 < 10", 9, "<", 10)]
+    [InlineData("11 <= 12", 11, "<=", 12)]
+    [InlineData("13 == 14", 13, "==", 14)]
+    [InlineData("15 > 16", 15, ">", 16)]
+    [InlineData("17 >= 18", 17, ">=", 18)]
+    [InlineData("19 != 20", 19, "!=", 20)]
+    public void ParseExpression_NumericBinaryOperations_ReturnsBinaryExpr(string source, int left, string op, int right)
     {
         var parser = new Parser();
         
@@ -20,9 +26,24 @@ public class ParserTests
 
         var expectedExpr = new BinaryExpr(
             LiteralExpr.Number(left),
-            _tokenFactory.FromChar(op),
+            _tokenFactory.FromString(op),
             LiteralExpr.Number(right));
+        Assert.Equal(expectedExpr, expr);
+    }
 
+    [Theory]
+    [InlineData("true && true", true, "&&", true)]
+    [InlineData("true || false", true, "||", false)]
+    public void ParseExpression_LogicalOperations_ReturnsBinaryExpr(string source, bool left, string op, bool right)
+    {
+        var parser = new Parser();
+        
+        var expr = parser.ParseExpression(source);
+
+        var expectedExpr = new BinaryExpr(
+            LiteralExpr.Bool(left),
+            _tokenFactory.FromString(op),
+            LiteralExpr.Bool(right));
         Assert.Equal(expectedExpr, expr);
     }
 

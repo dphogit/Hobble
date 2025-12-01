@@ -35,7 +35,29 @@ public class Parser(IReporter reporter)
 
     private Expr Expression()
     {
-        return Additive();
+        return LogicalOr();
+    }
+
+    private Expr LogicalOr()
+    {
+        return LeftAssociativeBinaryOperator(LogicalAnd, TokenType.PipePipe);
+    }
+
+    private Expr LogicalAnd()
+    {
+        return LeftAssociativeBinaryOperator(Equality, TokenType.AmpAmp);
+    }
+
+    private Expr Equality()
+    {
+        return LeftAssociativeBinaryOperator(Relational, TokenType.EqualEqual, TokenType.BangEqual);
+    }
+
+    private Expr Relational()
+    {
+        return LeftAssociativeBinaryOperator(
+            Additive,
+            TokenType.LessThan, TokenType.GreaterThan, TokenType.LessThanEqual, TokenType.GreaterThanEqual);
     }
 
     private Expr Additive()

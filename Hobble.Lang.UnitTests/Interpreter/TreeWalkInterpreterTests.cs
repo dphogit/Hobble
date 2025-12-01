@@ -10,18 +10,64 @@ public class TreeWalkInterpreterTests
     private readonly TokenFactory _tokenFactory = new();
     
     [Theory]
-    [InlineData(1, '+', 2, 3)]
-    [InlineData(4, '-', 2, 2)]
-    [InlineData(3, '*', 2, 6)]
-    [InlineData(10, '/', 2, 5)]
-    public void Evaluate_BinaryExpressions_EvaluatesCorrectly(int a, char op, int b, int expected)
+    [InlineData(1, "+", 2, 3)]
+    [InlineData(4, "-", 2, 2)]
+    [InlineData(3, "*", 2, 6)]
+    [InlineData(10, "/", 2, 5)]
+    public void Evaluate_ArithmeticExpressions_EvaluatesCorrectly(int a, string op, int b, int expected)
     {
         var interpreter = new TreeWalkInterpreter();
-        var expr = new BinaryExpr(LiteralExpr.Number(a), _tokenFactory.FromChar(op), LiteralExpr.Number(b));
+        var expr = new BinaryExpr(LiteralExpr.Number(a), _tokenFactory.FromString(op), LiteralExpr.Number(b));
 
         var result = interpreter.Evaluate(expr);
 
         var expectedResult = HobbleValue.Number(expected);
+        Assert.Equal(expectedResult, result);
+    }
+
+    [Theory]
+    [InlineData(1, "<", 2, true)]
+    [InlineData(2, "<", 1, false)]
+    [InlineData(3, "<=", 4, true)]
+    [InlineData(4, "<=", 4, true)]
+    [InlineData(4, "<=", 3, false)]
+    [InlineData(5, ">", 6, false)]
+    [InlineData(6, ">", 5, true)]
+    [InlineData(7, ">=", 8, false)]
+    [InlineData(8, ">=", 8, true)]
+    [InlineData(8, ">=", 7, true)]
+    [InlineData(9, "==", 9, true)]
+    [InlineData(9, "==", 10, false)]
+    [InlineData(11, "!=", 11, false)]
+    [InlineData(11, "!=", 12, true)]
+    public void Evaluate_RelationalExpressions_EvaluatesToCorrectBoolean(int a, string op, int b, bool expected)
+    {
+        var interpreter = new TreeWalkInterpreter();
+        var expr  = new BinaryExpr(LiteralExpr.Number(a), _tokenFactory.FromString(op), LiteralExpr.Number(b));
+        
+        var result = interpreter.Evaluate(expr);
+        
+        var expectedResult = HobbleValue.Bool(expected);
+        Assert.Equal(expectedResult, result);
+    }
+
+    [Theory]
+    [InlineData(false, "&&", false, false)]
+    [InlineData(false, "&&", true, false)]
+    [InlineData(true, "&&", false, false)]
+    [InlineData(true, "&&", true, true)]
+    [InlineData(false, "||", false, false)]
+    [InlineData(false, "||", true, true)]
+    [InlineData(true, "||", false, true)]
+    [InlineData(true, "||", true, true)]
+    public void Evaluate_LogicalExpressions_EvaluatesToCorrectBoolean(bool a, string op, bool b, bool expected)
+    {
+        var interpreter = new TreeWalkInterpreter();
+        var expr = new BinaryExpr(LiteralExpr.Bool(a), _tokenFactory.FromString(op), LiteralExpr.Bool(b));
+        
+        var result = interpreter.Evaluate(expr);
+        
+        var expectedResult = HobbleValue.Bool(expected);
         Assert.Equal(expectedResult, result);
     }
 
@@ -146,5 +192,44 @@ public class TreeWalkInterpreterTests
         var expr = new BinaryExpr(LiteralExpr.Number(1), _tokenFactory.Plus(), LiteralExpr.String("1"));
         
         Assert.Throws<RuntimeError>(() => interpreter.Evaluate(expr));
+    }
+
+    [Theory]
+    [InlineData("<")]
+    [InlineData("<=")]
+    [InlineData(">")]
+    [InlineData(">=")]
+    [InlineData("==")]
+    [InlineData("!=")]
+    public void Evaluate_RelationalOperatorsNonNumberArgs_ThrowsRuntimeError(string op)
+    {
+        var interpreter = new TreeWalkInterpreter();
+        var expr = new BinaryExpr(LiteralExpr.String("2"), _tokenFactory.FromString(op), LiteralExpr.Number(1));
+        var expr2 = new BinaryExpr(LiteralExpr.Number(1), _tokenFactory.FromString(op), LiteralExpr.String("2"));
+        
+        Assert.Throws<RuntimeError>(() => interpreter.Evaluate(expr));
+        Assert.Throws<RuntimeError>(() => interpreter.Evaluate(expr2));
+    }
+
+    [Fact]
+    public void Evaluate_LogicalAndNonBoolArgs_ThrowsRuntimeError()
+    {
+        var interpreter = new TreeWalkInterpreter();
+        var expr = new BinaryExpr(LiteralExpr.Number(1), _tokenFactory.AmpAmp(), LiteralExpr.True());
+        var expr2 = new BinaryExpr(LiteralExpr.True(), _tokenFactory.AmpAmp(), LiteralExpr.Number(1));
+        
+        Assert.Throws<RuntimeError>(() => interpreter.Evaluate(expr));
+        Assert.Throws<RuntimeError>(() => interpreter.Evaluate(expr2));
+    }
+    
+    [Fact]
+    public void Evaluate_LogicalOrNonBoolArgs_ThrowsRuntimeError()
+    {
+        var interpreter = new TreeWalkInterpreter();
+        var expr = new BinaryExpr(LiteralExpr.Number(1), _tokenFactory.PipePipe(), LiteralExpr.True());
+        var expr2 = new BinaryExpr(LiteralExpr.False(), _tokenFactory.PipePipe(), LiteralExpr.Number(1));
+        
+        Assert.Throws<RuntimeError>(() => interpreter.Evaluate(expr));
+        Assert.Throws<RuntimeError>(() => interpreter.Evaluate(expr2));
     }
 }

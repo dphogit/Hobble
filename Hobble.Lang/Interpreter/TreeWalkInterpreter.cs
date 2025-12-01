@@ -19,11 +19,43 @@ public class TreeWalkInterpreter
 
     private HobbleValue EvaluateBinaryExpr(BinaryExpr binaryExpr)
     {
-        var left = Evaluate(binaryExpr.Left);
-        var right = Evaluate(binaryExpr.Right);
-        
         var op = binaryExpr.Operator;
 
+        // Some operators short-circuit so we only want to evaluate what is needed,
+        // hence we don't evaluate and assign immediately.
+        HobbleValue left, right;
+
+        if (op.Type == TokenType.AmpAmp)
+        {
+            left = Evaluate(binaryExpr.Left);
+            CheckBoolOperand(left);
+
+            // If A is false, then A && B is false.
+            if (!left.AsBool())
+                return HobbleValue.Bool(false);
+            
+            right = Evaluate(binaryExpr.Right);
+            CheckBoolOperand(right);
+            return right;
+        }
+
+        if (op.Type == TokenType.PipePipe)
+        {
+            left = Evaluate(binaryExpr.Left);
+            CheckBoolOperand(left);
+
+            // If A is true, then A || B is true.
+            if (left.AsBool())
+                return HobbleValue.Bool(true);
+            
+            right = Evaluate(binaryExpr.Right);
+            CheckBoolOperand(right);
+            return right;
+        }
+        
+        left = Evaluate(binaryExpr.Left);
+        right = Evaluate(binaryExpr.Right);
+        
         switch (op.Type)
         {
             case TokenType.Plus:
@@ -52,6 +84,36 @@ public class TreeWalkInterpreter
                     ? throw new DivideByZeroError()
                     : HobbleValue.Number(left.AsNumber() / right.AsNumber());
             }
+            case TokenType.LessThan:
+            {
+                CheckNumberOperands(left, right);
+                return HobbleValue.Bool(left.AsNumber() < right.AsNumber());
+            }
+            case TokenType.GreaterThan:
+            {
+                CheckNumberOperands(left, right);
+                return HobbleValue.Bool(left.AsNumber() > right.AsNumber());
+            }
+            case TokenType.LessThanEqual:
+            {
+                CheckNumberOperands(left, right);
+                return HobbleValue.Bool(left.AsNumber() <= right.AsNumber());
+            }
+            case TokenType.GreaterThanEqual:
+            {
+                CheckNumberOperands(left, right);
+                return HobbleValue.Bool(left.AsNumber() >= right.AsNumber());
+            }
+            case TokenType.EqualEqual:
+            {
+                CheckNumberOperands(left, right);
+                return HobbleValue.Bool(left.AsNumber() == right.AsNumber());
+            }
+            case TokenType.BangEqual:
+            {
+                CheckNumberOperands(left, right);
+                return HobbleValue.Bool(left.AsNumber() != right.AsNumber());
+            }
             default:
                 throw new ArgumentException($"Invalid binary expression type '{binaryExpr.GetType()}'");
         }
@@ -60,6 +122,12 @@ public class TreeWalkInterpreter
         {
             if (!a.IsNumber() || !b.IsNumber())
                 throw new RuntimeError("Operands must both be Numbers.");
+        }
+
+        void CheckBoolOperand(HobbleValue a)
+        {
+            if (!a.IsBool())
+                throw new RuntimeError("Operand must be Bool.");
         }
     }
 

@@ -17,6 +17,15 @@ public class TokenFactory(int line = 1)
     public Token LeftParen() => Create("(", TokenType.LeftParen);
     public Token RightParen() => Create(")", TokenType.RightParen);
     public Token Bang() => Create("!", TokenType.Bang);
+    public Token Equal() => Create("=", TokenType.Equal);
+    public Token LessThan() => Create("<", TokenType.LessThan);
+    public Token GreaterThan() => Create(">", TokenType.GreaterThan);
+    public Token LessThanEqual() => Create("<=", TokenType.LessThanEqual);
+    public Token GreaterThanEqual() => Create(">=", TokenType.GreaterThanEqual);
+    public Token EqualEqual() => Create("==", TokenType.EqualEqual);
+    public Token BangEqual() => Create("!=", TokenType.BangEqual);
+    public Token AmpAmp() => Create("&&", TokenType.AmpAmp);
+    public Token PipePipe() => Create("||", TokenType.PipePipe);
     public Token Eof() => Create("", TokenType.Eof);
 
     public Token Error(string message) => Create(message, TokenType.Error);
@@ -27,15 +36,26 @@ public class TokenFactory(int line = 1)
     public void SetLine(int line) => _line = line;
     public void NextLine() => _line++;
 
-    public Token FromChar(char c)
+    public Token FromString(string s)
     {
-        return c switch
+        return s switch
         {
-            '+' => Plus(),
-            '-' => Minus(),
-            '*' => Star(),
-            '/' => Slash(),
-            _ => throw new ArgumentException($"Unknown token to create from '{c}'")
+            "+" => Plus(),
+            "-" => Minus(),
+            "*" => Star(),
+            "/" => Slash(),
+            "(" => LeftParen(),
+            ")" => RightParen(),
+            "=" => Equal(),
+            "<" => LessThan(),
+            ">" => GreaterThan(),
+            "<=" => LessThanEqual(),
+            ">=" => GreaterThanEqual(),
+            "==" => EqualEqual(),
+            "!=" => BangEqual(),
+            "&&" => AmpAmp(),
+            "||" => PipePipe(),
+            _ => throw new ArgumentException($"Unknown token to create from '{s}'")
         };
     }
 }

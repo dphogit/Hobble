@@ -55,11 +55,23 @@ public class Scanner(string source)
             case ')':
                 return _tokenFactory.RightParen();
             case '!':
-                return _tokenFactory.Bang();
-
+                return Match('=') ? _tokenFactory.BangEqual() : _tokenFactory.Bang();
+            case '<':
+                return Match('=') ? _tokenFactory.LessThanEqual() : _tokenFactory.LessThan();
+            case '>':
+                return Match('=') ? _tokenFactory.GreaterThanEqual() : _tokenFactory.GreaterThan();
+            case '=':
+                return Match('=') ? _tokenFactory.EqualEqual() : _tokenFactory.Equal();
+            case '&':
+                return Match('&')
+                    ? _tokenFactory.AmpAmp()
+                    : _tokenFactory.Error("Logical AND requires two ampersands.");
+            case '|':
+                return Match('|')
+                    ? _tokenFactory.PipePipe()
+                    : _tokenFactory.Error("Logical OR requires two ampersands.");
             case '"':
                 return String();
-
             default:
                 return _tokenFactory.Error($"Unexpected character '{c}'.");
         }
@@ -150,7 +162,7 @@ public class Scanner(string source)
 
     private char Peek()
     {
-        return source[_current];
+        return _current >= source.Length ? '\0' : source[_current];
     }
 
     private char PeekNext()
@@ -165,6 +177,18 @@ public class Scanner(string source)
         var c = Peek();
         _current++;
         return c;
+    }
+
+    /// <summary>Checks the current character of the scanner and advances the scanner if it matches.</summary>
+    /// <param name="c">The expected character to match on.</param>
+    /// <returns>True if the current character the scanner is on matches the passed character.</returns>
+    private bool Match(char c)
+    {
+        if (c != Peek())
+            return false;
+        
+        Advance();
+        return true;
     }
 
     private void NextLine()
