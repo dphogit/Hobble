@@ -3,7 +3,7 @@ using Hobble.Lang.Lexical;
 using Hobble.Lang.Parsing;
 using Hobble.Lang.Representation;
 
-namespace Hobble.Lang.UnitTests.Parsing;
+namespace Hobble.Lang.UnitTests.Interpreter;
 
 public class TreeWalkInterpreterTests
 {
@@ -36,6 +36,35 @@ public class TreeWalkInterpreterTests
         var result = interpreter.Evaluate(expr);
         
         var expectedResult = HobbleValue.Number(-value);
+        Assert.Equal(expectedResult, result);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void Evaluate_BangInFrontOfBool_EvaluatesToLogicalNegation(bool b)
+    {
+        var interpreter = new TreeWalkInterpreter();
+        var expr = new UnaryExpr(_tokenFactory.Bang(), LiteralExpr.Bool(b));
+        
+        var result = interpreter.Evaluate(expr);
+
+        var expectedResult = HobbleValue.Bool(!b);
+        Assert.Equal(expectedResult, result);
+    }
+    
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void Evaluate_DoubleBangInFrontOfBool_EvaluatesToSameValue(bool b)
+    {
+        var interpreter = new TreeWalkInterpreter();
+        var innerExpr = new UnaryExpr(_tokenFactory.Bang(), LiteralExpr.Bool(b));
+        var expr = new UnaryExpr(_tokenFactory.Bang(), innerExpr);
+        
+        var result = interpreter.Evaluate(expr);
+
+        var expectedResult = HobbleValue.Bool(b);
         Assert.Equal(expectedResult, result);
     }
     
@@ -88,6 +117,15 @@ public class TreeWalkInterpreterTests
     {
         var interpreter = new TreeWalkInterpreter();
         var expr = new UnaryExpr(_tokenFactory.Minus(), LiteralExpr.String("1"));
+        
+        Assert.Throws<RuntimeError>(() => interpreter.Evaluate(expr));
+    }
+
+    [Fact]
+    public void Evaluate_LogicalNegateNonBool_ThrowsRuntimeError()
+    {
+        var interpreter = new TreeWalkInterpreter();
+        var expr = new UnaryExpr(_tokenFactory.Bang(), LiteralExpr.Number(0));
         
         Assert.Throws<RuntimeError>(() => interpreter.Evaluate(expr));
     }

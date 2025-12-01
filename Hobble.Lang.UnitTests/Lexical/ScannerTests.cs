@@ -11,6 +11,9 @@ public class ScannerTests
     [InlineData("/", TokenType.Slash)]
     [InlineData("(", TokenType.LeftParen)]
     [InlineData(")", TokenType.RightParen)]
+    [InlineData("!", TokenType.Bang)]
+    [InlineData("false", TokenType.False)]
+    [InlineData("true", TokenType.True)]
     [InlineData("", TokenType.Eof)]
     public void NextToken_NonValueTokenTypes_ReturnsToken(string lexeme, TokenType type)
     {

@@ -50,13 +50,13 @@ public class Parser(IReporter reporter)
 
     private Expr Unary()
     {
-        if (Match(TokenType.Minus))
+        if (Match(TokenType.Minus, TokenType.Bang))
         {
             var op = _prev;
             var right = Unary();
             return new UnaryExpr(op, right);
         }
-        
+
         return Primary();
     }
 
@@ -74,6 +74,12 @@ public class Parser(IReporter reporter)
             Consume(TokenType.RightParen, "Expected closing ')' at end of expression.");
             return expr;
         }
+
+        if (Match(TokenType.True))
+            return LiteralExpr.True();
+        
+        if (Match(TokenType.False))
+            return LiteralExpr.False();
 
         throw CreateParseError("Expected expression.");
     }

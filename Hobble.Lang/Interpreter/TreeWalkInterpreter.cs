@@ -74,6 +74,10 @@ public class TreeWalkInterpreter
                 ? HobbleValue.Number(-right.AsNumber())
                 : throw new RuntimeError("Negation operand must be a Number."),
             
+            TokenType.Bang => right.IsBool()
+                ? HobbleValue.Bool(!right.AsBool())
+                : throw new RuntimeError("Logical negation operand must be a Bool."),
+            
             _ => throw new ArgumentException($"Invalid unary expression type '{unaryExpr.GetType()}'")
         };
     }

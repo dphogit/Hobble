@@ -37,6 +37,9 @@ public class Scanner(string source)
         if (IsHobbleDigit(c))
             return Number();
 
+        if (IsHobbleAlpha(c))
+            return Identifier();
+
         switch (c)
         {
             case '+':
@@ -51,6 +54,8 @@ public class Scanner(string source)
                 return _tokenFactory.LeftParen();
             case ')':
                 return _tokenFactory.RightParen();
+            case '!':
+                return _tokenFactory.Bang();
 
             case '"':
                 return String();
@@ -84,6 +89,18 @@ public class Scanner(string source)
             while (!AtEnd() && IsHobbleDigit(Peek()))
                 Advance();
         }
+    }
+
+    private Token Identifier()
+    {
+        while (!AtEnd() && IsHobbleAlpha(Peek()))
+            Advance();
+        
+        var lexeme = source.Substring(_start, _current - _start);
+
+        return Keywords.TryGetTokenType(lexeme, out var type)
+            ? new Token(lexeme, type.Value, _line)
+            : throw new NotImplementedException("Variable identifiers are not implemented yet");
     }
 
     private Token String()
@@ -165,5 +182,10 @@ public class Scanner(string source)
     private static bool IsHobbleDigit(char c)
     {
         return char.IsAsciiDigit(c);
+    }
+
+    private static bool IsHobbleAlpha(char c)
+    {
+        return char.IsAsciiLetter(c) || c == '_';
     }
 }

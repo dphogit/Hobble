@@ -8,9 +8,13 @@ public enum TokenType
     Slash,
     LeftParen,
     RightParen,
+    Bang,
     
     String,
     Number,
+    
+    True,
+    False,
     
     Error,
     Eof,

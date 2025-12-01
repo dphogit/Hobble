@@ -48,6 +48,32 @@ public class ParserTests
         var expectedExpr = new UnaryExpr(_tokenFactory.Minus(), nestedExpr);
         Assert.Equal(expectedExpr, expr);
     }
+    
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void ParseExpression_Boolean_ReturnsLiteral(bool operand)
+    {
+        var parser = new Parser();
+        
+        var expr = parser.ParseExpression(operand.ToString().ToLower());
+        
+        var expectedExpr = LiteralExpr.Bool(operand); 
+        Assert.Equal(expectedExpr, expr);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void ParseExpression_LogicalNot_ReturnsUnaryExpr(bool operand)
+    {
+        var parser = new Parser();
+        
+        var expr = parser.ParseExpression($"!{operand}".ToLower());
+        
+        var expectedExpr = new UnaryExpr(_tokenFactory.Bang(), LiteralExpr.Bool(operand));
+        Assert.Equal(expectedExpr, expr);
+    }
 
     [Fact]
     public void ParseExpression_MultiplePrecedence_ReturnsCorrectPrecedenceExpr()

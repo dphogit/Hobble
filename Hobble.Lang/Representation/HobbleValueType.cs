@@ -3,5 +3,6 @@
 public enum HobbleValueType
 {
     Number,
-    String
+    String,
+    Bool,
 }
