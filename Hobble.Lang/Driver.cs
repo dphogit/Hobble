@@ -1,19 +1,24 @@
-﻿using Hobble.Lang.Interpreter;
+﻿using Hobble.Lang.Interface;
+using Hobble.Lang.Interpreter;
 using Hobble.Lang.Parsing;
 
 namespace Hobble.Lang;
 
-public class Driver
+public class Driver(IReporter reporter)
 {
+    private readonly Parser _parser = new(reporter);
+    private readonly TreeWalkInterpreter _interpreter = new();
+    
+    public Driver() : this(new ConsoleReporter()) { }
+    
     public void Run(string source)
     {
-        var parser = new Parser();
-        var interpreter = new TreeWalkInterpreter();
+        var stmt = _parser.ParseStatement(source);
+        _interpreter.Execute(stmt);
+    }
 
-        var expression = parser.ParseExpression(source);
-        
-        var value = interpreter.Evaluate(expression);
-        
-        Console.WriteLine(value);
+    public void RunFile(string file)
+    {
+        throw new NotImplementedException("File running not implemented yet.");
     }
 }

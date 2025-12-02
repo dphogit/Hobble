@@ -1,11 +1,41 @@
-﻿using Hobble.Lang.Lexical;
+﻿using Hobble.Lang.Interface;
+using Hobble.Lang.Lexical;
 using Hobble.Lang.Parsing;
 using Hobble.Lang.Representation;
 
 namespace Hobble.Lang.Interpreter;
 
-public class TreeWalkInterpreter
+public class TreeWalkInterpreter(IReporter reporter)
 {
+    public TreeWalkInterpreter() : this(new ConsoleReporter()) { }
+    
+    #region Statement Execution
+
+    public void Execute(Stmt stmt)
+    {
+        switch (stmt)
+        {
+            case ExprStmt exprStmt:
+                Evaluate(exprStmt.Expr);
+                return;
+            case PrintStmt printStmt:
+                ExecutePrintStmt(printStmt);
+                return;
+            default:
+                throw new ArgumentException($"Invalid statement type {stmt.GetType()}");
+        }
+    }
+
+    private void ExecutePrintStmt(PrintStmt printStmt)
+    {
+        var result = Evaluate(printStmt.Expr);
+        reporter.Output(result.ToString());
+    }
+    
+    #endregion
+    
+    #region Expression Evaluation 
+    
     public HobbleValue Evaluate(Expr expression)
     {
         return expression switch
@@ -16,7 +46,7 @@ public class TreeWalkInterpreter
             _ => throw new ArgumentException($"Invalid expression type {expression.GetType()}")
         };
     }
-
+    
     private HobbleValue EvaluateBinaryExpr(BinaryExpr binaryExpr)
     {
         var op = binaryExpr.Operator;
@@ -149,4 +179,6 @@ public class TreeWalkInterpreter
             _ => throw new ArgumentException($"Invalid unary expression type '{unaryExpr.GetType()}'")
         };
     }
+    
+    #endregion
 }

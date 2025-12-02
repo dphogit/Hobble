@@ -14,4 +14,9 @@ public class ConsoleReporter : IReporter
     {
         Console.Error.WriteLine($"[Line {line}] Error at {at}: {message}");
     }
+
+    public void Output(string message)
+    {
+        Console.WriteLine(message);
+    }
 }

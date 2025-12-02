@@ -3,35 +3,82 @@ using Hobble.Lang.Lexical;
 
 namespace Hobble.Lang.Parsing;
 
-public class Parser(IReporter reporter)
+public class Parser
 {
     private class ParseError(string message) : Exception(message);
-    
+
     /// <summary>The previous token that the scanner just scanned/advanced from.</summary>
-    private Token _prev = null!;
-    
+    private Token _prev;
+
     /// <summary>The current token in the source the scanner is on.</summary>
-    private Token _current = null!;
+    private Token _current;
 
     private Scanner _scanner = null!;
+    
+    private readonly IReporter _reporter;
 
     public Parser() : this(new ConsoleReporter()) { }
-    
+
+    public Parser(IReporter reporter)
+    {
+        _reporter = reporter;
+
+        _prev = null!;
+        _current = null!;
+    }
+
     /// <summary>Parses the source into an expression tree.</summary>
     /// <param name="source">The expression to parse.</param>
     /// <returns>An expression tree according to the language's grammar.</returns>
     public Expr ParseExpression(string source)
     {
-        _prev = null!;
-        _current = null!;
         _scanner = new Scanner(source);
         
         Advance();
         var expr = Expression();
-        Consume(TokenType.Eof, "Expected end of expression.");
+        Consume(TokenType.Eof, "Expected EOF.");
 
         return expr;
     }
+
+    public Stmt ParseStatement(string source)
+    {
+        _scanner = new Scanner(source);
+        
+        Advance();
+        var stmt = Statement();
+        Consume(TokenType.Eof, "Expected EOF.");
+        
+        return stmt;
+    }
+
+    #region Statement Grammar
+
+    private Stmt Statement()
+    {
+        if (Match(TokenType.Print))
+            return PrintStmt();
+
+        return ExprStmt();
+    }
+
+    private PrintStmt PrintStmt()
+    {
+        var expr = Expression();
+        ConsumeEndOfStatementSemiColon();
+        return new PrintStmt(expr);
+    }
+
+    private ExprStmt ExprStmt()
+    {
+        var expr = Expression();
+        ConsumeEndOfStatementSemiColon();
+        return new ExprStmt(expr);
+    }
+    
+    #endregion
+
+    #region Expression Grammar 
 
     private Expr Expression()
     {
@@ -120,6 +167,8 @@ public class Parser(IReporter reporter)
         return expr;
     }
 
+    #endregion
+
     private void Advance()
     {
         _prev = _current;
@@ -148,6 +197,11 @@ public class Parser(IReporter reporter)
         throw CreateParseError(failureMessage);
     }
 
+    private void ConsumeEndOfStatementSemiColon()
+    {
+        Consume(TokenType.SemiColon, "Expected ';' at end of statement.");
+    }
+
     private bool Check(TokenType type)
     {
         return _current.Type == type;
@@ -164,7 +218,7 @@ public class Parser(IReporter reporter)
 
     private ParseError CreateParseError(string message)
     {
-        reporter.Error(_current, message);
+        _reporter.Error(_current, message);
         return new ParseError(message);
     }
 }

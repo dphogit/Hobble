@@ -134,4 +134,26 @@ public class ParserTests
         var expectedExpr = new BinaryExpr(expectedLeft, _tokenFactory.Plus(), expectedRight);
         Assert.Equal(expectedExpr, expr);
     }
+
+    [Fact]
+    public void ParseStatement_PrintKeyword_ReturnsPrintStmt()
+    {
+        var parser = new Parser();
+        
+        var expr = parser.ParseStatement("print true;");
+
+        var expectedExpr = new PrintStmt(LiteralExpr.True());
+        Assert.Equal(expectedExpr, expr);
+    }
+
+    [Fact]
+    public void ParseStatement_ExpressionStatement_ReturnsExprStmt()
+    {
+        var parser = new Parser();
+        
+        var expr = parser.ParseStatement("true;");
+        
+        var expectedExpr = new ExprStmt(LiteralExpr.True());
+        Assert.Equal(expectedExpr, expr);
+    }
 }

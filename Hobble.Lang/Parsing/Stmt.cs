@@ -1,0 +1,7 @@
+﻿namespace Hobble.Lang.Parsing;
+
+public abstract record Stmt;
+
+public sealed record ExprStmt(Expr Expr) : Stmt;
+
+public sealed record PrintStmt(Expr Expr) : Stmt;

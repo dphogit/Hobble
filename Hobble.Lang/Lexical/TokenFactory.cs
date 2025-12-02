@@ -26,6 +26,7 @@ public class TokenFactory(int line = 1)
     public Token BangEqual() => Create("!=", TokenType.BangEqual);
     public Token AmpAmp() => Create("&&", TokenType.AmpAmp);
     public Token PipePipe() => Create("||", TokenType.PipePipe);
+    public Token SemiColon() => Create(";", TokenType.SemiColon);
     public Token Eof() => Create("", TokenType.Eof);
 
     public Token Error(string message) => Create(message, TokenType.Error);
@@ -55,6 +56,7 @@ public class TokenFactory(int line = 1)
             "!=" => BangEqual(),
             "&&" => AmpAmp(),
             "||" => PipePipe(),
+            ";" => SemiColon(),
             _ => throw new ArgumentException($"Unknown token to create from '{s}'")
         };
     }

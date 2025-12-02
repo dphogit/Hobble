@@ -1,7 +1,9 @@
-﻿using Hobble.Lang.Interpreter;
+﻿using Hobble.Lang.Interface;
+using Hobble.Lang.Interpreter;
 using Hobble.Lang.Lexical;
 using Hobble.Lang.Parsing;
 using Hobble.Lang.Representation;
+using NSubstitute;
 
 namespace Hobble.Lang.UnitTests.Interpreter;
 
@@ -231,5 +233,17 @@ public class TreeWalkInterpreterTests
         
         Assert.Throws<RuntimeError>(() => interpreter.Evaluate(expr));
         Assert.Throws<RuntimeError>(() => interpreter.Evaluate(expr2));
+    }
+    
+    [Fact]
+    public void Execute_PrintStmt_OutputsCorrectEvaluatedExpression()
+    {
+        var reporter = Substitute.For<IReporter>();
+        var interpreter = new TreeWalkInterpreter(reporter);
+        var stmt = new PrintStmt(LiteralExpr.Number(67));
+
+        interpreter.Execute(stmt);
+        
+        reporter.Received().Output("67");
     }
 }

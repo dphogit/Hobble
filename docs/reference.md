@@ -8,6 +8,7 @@ idioms and how the language works.
   * [Types](#types)
   * [Grammar](#grammar)
     * [Syntax Grammar](#syntax-grammar)
+      * [Statements](#statements)
       * [Expressions](#expressions)
     * [Lexical Grammar](#lexical-grammar)
       * [Comments](#comments)
@@ -30,6 +31,9 @@ idioms and how the language works.
       * [Logical And Operator `&&`](#logical-and-operator-)
       * [Logical Or Operator `||`](#logical-or-operator-)
     * [Operator Precedence](#operator-precedence)
+  * [Statements](#statements-1)
+    * [Expression Statements](#expression-statements)
+    * [Print Statements](#print-statements)
 <!-- TOC -->
 
 ## Types
@@ -55,7 +59,19 @@ We include the description of some of the special notation used.
 
 ### Syntax Grammar
 
-The syntax grammar parses a sequence of tokens into a structure the downstream to compute on.
+The syntax grammar parses a sequence of tokens into a tree structure the downstream to compute on.
+
+#### Statements
+
+Statements produce side effects, without creating bindings.
+
+```ebnf
+statement = exprStmt | printStmt ;
+
+exprStmt  = expression ";" ;
+
+printStmt = "print" expression ";" ;
+```
 
 #### Expressions
 
@@ -108,7 +124,7 @@ Comments are used to annotate the program for helping the developer's understand
 Two types of comments are supported:
 1. **Single-Line Comments:** Begin with the characters `//` and extends to the end of the line.
 2. **Block Comments:** Begin with the characters `/*` and ends with the characters `*/`. They can occupy a portion of a
-line or span over multiple lines.
+line or span over multiple lines. [TODO - Implementation]
 
 Comments do not nested, and do not hold any meaning within each other regardless of comment type.
 
@@ -327,4 +343,28 @@ parentheses to evaluate the enclosing expression before any other evaluation hap
 ```hob
 print 6 * 2 + 1     // output: 13
 print 6 * (2 + 1)   // output: 18
+```
+
+## Statements
+
+### Expression Statements
+
+Expression statements allow users to place expressions where a statement is expected. The evaluation result of the
+expression is discarded, but expression statements are useful for producing side effects e.g. function calls.
+
+```hob
+fn sayHello() {
+  print "Hello";
+}
+
+sayHello(); // "Hello";
+```
+
+### Print Statements
+
+Evaluates an expression and outputs the result to the user.
+
+```hob
+print 1 + 2;  // output: 3
+print 5 * 9;  // output: 45
 ```

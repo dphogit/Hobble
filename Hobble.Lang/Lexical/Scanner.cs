@@ -70,6 +70,8 @@ public class Scanner(string source)
                 return Match('|')
                     ? _tokenFactory.PipePipe()
                     : _tokenFactory.Error("Logical OR requires two ampersands.");
+            case ';':
+                return _tokenFactory.SemiColon();
             case '"':
                 return String();
             default:

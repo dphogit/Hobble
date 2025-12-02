@@ -18,12 +18,14 @@ public enum TokenType
     BangEqual,
     AmpAmp,
     PipePipe,
+    SemiColon,
     
     String,
     Number,
     
     True,
     False,
+    Print,
     
     Error,
     Eof,

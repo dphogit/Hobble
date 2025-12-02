@@ -21,8 +21,10 @@ public class ScannerTests
     [InlineData("!=", TokenType.BangEqual)]
     [InlineData("&&", TokenType.AmpAmp)]
     [InlineData("||", TokenType.PipePipe)]
+    [InlineData(";", TokenType.SemiColon)]
     [InlineData("false", TokenType.False)]
     [InlineData("true", TokenType.True)]
+    [InlineData("print", TokenType.Print)]
     [InlineData("", TokenType.Eof)]
     public void NextToken_NonValueTokenTypes_ReturnsToken(string lexeme, TokenType type)
     {
