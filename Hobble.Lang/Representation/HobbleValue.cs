@@ -14,10 +14,12 @@ public record HobbleValue
     public static HobbleValue Number(decimal value) => new(value, HobbleValueType.Number);
     public static HobbleValue String(string value) => new(value, HobbleValueType.String);
     public static HobbleValue Bool(bool value) => new(value, HobbleValueType.Bool);
+    public static HobbleValue Null() => new(null, HobbleValueType.Null);
 
     public bool IsNumber() => _type == HobbleValueType.Number;
     public bool IsString() => _type == HobbleValueType.String;
     public bool IsBool() => _type == HobbleValueType.Bool;
+    public bool IsNull() => _type == HobbleValueType.Null;
 
     public decimal AsNumber() => IsNumber()
         ? Convert.ToDecimal(_value)
@@ -40,6 +42,8 @@ public record HobbleValue
                 return _value!.ToString()!;
             case HobbleValueType.Bool:
                 return (bool)_value! ? "true" : "false";
+            case HobbleValueType.Null:
+                return "null";
             default:
                 throw new InvalidOperationException($"Cannot convert '{_type.ToString()}' to string.");
         }

@@ -9,6 +9,7 @@ public static class Keywords
         { "false", TokenType.False },
         { "true", TokenType.True },
         { "print", TokenType.Print },
+        { "var", TokenType.Var },
     };
 
     public static bool TryGetTokenType(string keyword, [NotNullWhen(true)] out TokenType? tokenType)

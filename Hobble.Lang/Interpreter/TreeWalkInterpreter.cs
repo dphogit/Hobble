@@ -7,6 +7,8 @@ namespace Hobble.Lang.Interpreter;
 
 public class TreeWalkInterpreter(IReporter reporter)
 {
+    private VariableEnvironment _globalVariables = new();
+    
     public TreeWalkInterpreter() : this(new ConsoleReporter()) { }
     
     #region Statement Execution
@@ -21,6 +23,9 @@ public class TreeWalkInterpreter(IReporter reporter)
             case PrintStmt printStmt:
                 ExecutePrintStmt(printStmt);
                 return;
+            case VarStmt varStmt:
+                ExecuteVarStmt(varStmt);
+                return;
             default:
                 throw new ArgumentException($"Invalid statement type {stmt.GetType()}");
         }
@@ -30,6 +35,12 @@ public class TreeWalkInterpreter(IReporter reporter)
     {
         var result = Evaluate(printStmt.Expr);
         reporter.Output(result.ToString());
+    }
+
+    private void ExecuteVarStmt(VarStmt varStmt)
+    {
+        var value = varStmt.Initializer is null ? HobbleValue.Null() : Evaluate(varStmt.Initializer);
+        _globalVariables.Define(varStmt.Identifier.Lexeme, value);
     }
     
     #endregion
@@ -43,6 +54,7 @@ public class TreeWalkInterpreter(IReporter reporter)
             BinaryExpr binaryExpr => EvaluateBinaryExpr(binaryExpr),
             LiteralExpr literalExpr => literalExpr.Value,
             UnaryExpr unaryExpr => EvaluateUnaryExpr(unaryExpr),
+            VarExpr varExpr => EvaluateVarExpr(varExpr),
             _ => throw new ArgumentException($"Invalid expression type {expression.GetType()}")
         };
     }
@@ -178,6 +190,11 @@ public class TreeWalkInterpreter(IReporter reporter)
             
             _ => throw new ArgumentException($"Invalid unary expression type '{unaryExpr.GetType()}'")
         };
+    }
+
+    private HobbleValue EvaluateVarExpr(VarExpr varExpr)
+    {
+        return _globalVariables.Get(varExpr.Identifier.Lexeme);
     }
     
     #endregion

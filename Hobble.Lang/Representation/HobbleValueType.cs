@@ -5,4 +5,5 @@ public enum HobbleValueType
     Number,
     String,
     Bool,
+    Null,
 }

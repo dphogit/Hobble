@@ -8,9 +8,6 @@ public class Scanner(string source)
     /// <summary>Index of the current character to be scanned in the source.</summary>
     private int _current = 0;
 
-    /// <summary>Current line the scanner is on.</summary>
-    private int _line = 1;
-
     private readonly TokenFactory _tokenFactory = new();
 
     /// <summary>Scans the next token in the source.</summary>
@@ -113,8 +110,8 @@ public class Scanner(string source)
         var lexeme = source.Substring(_start, _current - _start);
 
         return Keywords.TryGetTokenType(lexeme, out var type)
-            ? new Token(lexeme, type.Value, _line)
-            : throw new NotImplementedException("Variable identifiers are not implemented yet");
+            ? _tokenFactory.Keyword(lexeme, type.Value)
+            : _tokenFactory.Identifier(lexeme);
     }
 
     private Token String()
@@ -196,7 +193,6 @@ public class Scanner(string source)
     private void NextLine()
     {
         Advance();
-        _line++;
         _tokenFactory.NextLine();
     }
 

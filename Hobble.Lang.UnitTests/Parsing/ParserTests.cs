@@ -6,6 +6,8 @@ namespace Hobble.Lang.UnitTests.Parsing;
 public class ParserTests
 {
     private readonly TokenFactory _tokenFactory = new();
+
+    #region Expression Parsing
     
     [Theory]
     [InlineData("1 + 2", 1, "+", 2)]
@@ -136,14 +138,30 @@ public class ParserTests
     }
 
     [Fact]
+    public void ParseExpression_Identifier_ReturnsVarExpr()
+    {
+        const string identifier = "age";
+        var parser = new Parser();
+        
+        var expr = parser.ParseExpression(identifier);
+        
+        var expectedExpr = new VarExpr(_tokenFactory.Identifier(identifier));
+        Assert.Equal(expectedExpr, expr);
+    }
+
+    #endregion
+    
+    #region Statement Parsing
+
+    [Fact]
     public void ParseStatement_PrintKeyword_ReturnsPrintStmt()
     {
         var parser = new Parser();
         
-        var expr = parser.ParseStatement("print true;");
+        var stmt = parser.ParseStatement("print true;");
 
-        var expectedExpr = new PrintStmt(LiteralExpr.True());
-        Assert.Equal(expectedExpr, expr);
+        var expectedStmt = new PrintStmt(LiteralExpr.True());
+        Assert.Equal(expectedStmt, stmt);
     }
 
     [Fact]
@@ -151,9 +169,33 @@ public class ParserTests
     {
         var parser = new Parser();
         
-        var expr = parser.ParseStatement("true;");
+        var stmt = parser.ParseStatement("true;");
         
-        var expectedExpr = new ExprStmt(LiteralExpr.True());
-        Assert.Equal(expectedExpr, expr);
+        var expectedStmt = new ExprStmt(LiteralExpr.True());
+        Assert.Equal(expectedStmt, stmt);
     }
+
+    [Fact]
+    public void ParseStatement_VariableDeclarationNoInitializer_ReturnsVarStmt()
+    {
+        var parser = new Parser();
+        
+        var stmt = parser.ParseStatement("var x;");
+
+        var expectedStmt = new VarStmt(_tokenFactory.Identifier("x"));
+        Assert.Equal(expectedStmt, stmt);
+    }
+
+    [Fact]
+    public void ParseStatement_VariableDeclarationInitializer_ReturnsVarStmt()
+    {
+        var parser = new Parser();
+        
+        var stmt = parser.ParseStatement("var x = 67;");
+
+        var expectedStmt = new VarStmt(_tokenFactory.Identifier("x"), LiteralExpr.Number(67));
+        Assert.Equal(expectedStmt, stmt);
+    }
+
+    #endregion
 }

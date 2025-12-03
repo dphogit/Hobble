@@ -8,7 +8,7 @@ idioms and how the language works.
   * [Types](#types)
   * [Grammar](#grammar)
     * [Syntax Grammar](#syntax-grammar)
-      * [Statements](#statements)
+      * [Declarations and Statements](#declarations-and-statements)
       * [Expressions](#expressions)
     * [Lexical Grammar](#lexical-grammar)
       * [Comments](#comments)
@@ -31,7 +31,8 @@ idioms and how the language works.
       * [Logical And Operator `&&`](#logical-and-operator-)
       * [Logical Or Operator `||`](#logical-or-operator-)
     * [Operator Precedence](#operator-precedence)
-  * [Statements](#statements-1)
+  * [Statements](#statements)
+    * [Variable Declaration Statements](#variable-declaration-statements)
     * [Expression Statements](#expression-statements)
     * [Print Statements](#print-statements)
 <!-- TOC -->
@@ -43,6 +44,7 @@ Hobble has the following built-in types:
 - **Number**: A single type is to cover all numeric types. e.g. `-5`, `67`, `42.69`
 - **String**: A sequence of characters. e.g. `"Hello, World!"`.
 - **Bool**: A Boolean value, which is either `true`, or `false`.
+- **Null**: A null reference, does not refer to any value.
 
 ## Grammar
 
@@ -61,9 +63,17 @@ We include the description of some of the special notation used.
 
 The syntax grammar parses a sequence of tokens into a tree structure the downstream to compute on.
 
-#### Statements
+#### Declarations and Statements
 
-Statements produce side effects, without creating bindings.
+Declaration statements introduce binding to identifiers.
+
+```ebnf
+declaration = varDecl | statement ;
+
+varDecl     = "var" IDENTIFIER ( "=" expression )? ";" ;
+```
+
+The remaining statements which aren't declarations, produce side effects without creating bindings.
 
 ```ebnf
 statement = exprStmt | printStmt ;
@@ -96,7 +106,7 @@ multiplicative = unary ( ( "*" | "/" ) unary )* ;
 
 unary          = ( ( "-" | "!" ) unary ) | primary ;
 
-primary        = NUMBER | STRING | grouping ;
+primary        = NUMBER | STRING | grouping | IDENTIFIER | "false" | "true" ;
 
 grouping       = "(" expression ")" ;
 ```
@@ -106,15 +116,17 @@ grouping       = "(" expression ")" ;
 The lexical grammar groups a stream of characters (string) into tokens for downstream parsing.
 
 ```ebnf
-NUMBER = DIGIT+ ( "." DIGIT+ )? ;
+NUMBER     = DIGIT+ ( "." DIGIT+ )? ;
 
-STRING = " \" <any character except \"> \" " ;
+STRING     = " \" <any character except \"> \" " ;
 
-ALPHA  = "a" | ... | "z" | "A" | ... | "Z" | UNDER ;
+ALPHA      = "a" | ... | "z" | "A" | ... | "Z" | UNDER ;
 
-UNDER  = "_" ;
+UNDER      = "_" ;
 
-DIGIT  = "0" | ... | "9" ;
+DIGIT      = "0" | ... | "9" ;
+
+IDENTIFIER = ALPHA ( ALPHA | DIGIT ) * ;
 ```
 
 #### Comments
@@ -346,6 +358,29 @@ print 6 * (2 + 1)   // output: 18
 ```
 
 ## Statements
+
+### Variable Declaration Statements
+
+Variables are declared through a user-defined unique identifier, which can be optionally initialised.
+
+```hob
+var width;        // Without initialisation
+var length = 10;  // With initialisation
+```
+
+If a variable is not explicitly initialised by the user, it is implicitly assigned `null`.
+
+```hob
+var a;
+print a;  // output: "nil"
+```
+
+Variables once defined, cannot be redefined in the same scope.
+
+```hob
+var a = "hello";
+var a = "world";  // error: variable 'a' already defined.
+```
 
 ### Expression Statements
 

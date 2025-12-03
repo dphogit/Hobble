@@ -6,9 +6,13 @@ public class TokenFactory(int line = 1)
 
     public Token Number(string lexeme, decimal value) => Create(lexeme, TokenType.Number, value);
     public Token String(string value) => Create($"\"{value}\"", TokenType.String, value);
-    
+
+    public Token Keyword(string keyword, TokenType type) => Create(keyword, type);
+    public Token Identifier(string identifier) => Create(identifier, TokenType.Identifier);
+
     public Token True() => Create("true", TokenType.True);
     public Token False() => Create("false", TokenType.False);
+    public Token Var() => Create("var", TokenType.Var);
 
     public Token Plus() => Create("+", TokenType.Plus);
     public Token Minus() => Create("-", TokenType.Minus);
@@ -28,7 +32,6 @@ public class TokenFactory(int line = 1)
     public Token PipePipe() => Create("||", TokenType.PipePipe);
     public Token SemiColon() => Create(";", TokenType.SemiColon);
     public Token Eof() => Create("", TokenType.Eof);
-
     public Token Error(string message) => Create(message, TokenType.Error);
 
     private Token Create(string lexeme, TokenType type) => new(lexeme, type, _line);
@@ -57,6 +60,9 @@ public class TokenFactory(int line = 1)
             "&&" => AmpAmp(),
             "||" => PipePipe(),
             ";" => SemiColon(),
+            "false" => False(),
+            "true" => True(),
+            "var" => Var(),
             _ => throw new ArgumentException($"Unknown token to create from '{s}'")
         };
     }

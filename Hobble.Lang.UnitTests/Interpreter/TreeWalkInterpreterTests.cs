@@ -10,6 +10,8 @@ namespace Hobble.Lang.UnitTests.Interpreter;
 public class TreeWalkInterpreterTests
 {
     private readonly TokenFactory _tokenFactory = new();
+
+    #region Expression Evaluation
     
     [Theory]
     [InlineData(1, "+", 2, 3)]
@@ -236,6 +238,24 @@ public class TreeWalkInterpreterTests
     }
     
     [Fact]
+    public void Evaluate_Variable_RetrievesAssociatedValue()
+    {
+        var identifier = _tokenFactory.Identifier("age");
+        var interpreter = new TreeWalkInterpreter();
+        var varDecl = new VarStmt(identifier, LiteralExpr.Number(67));
+        interpreter.Execute(varDecl);
+
+        var result = interpreter.Evaluate(new VarExpr(identifier));
+
+        var expectedResult = HobbleValue.Number(67);
+        Assert.Equal(expectedResult, result);
+    }
+    
+    #endregion
+
+    #region Statement Execution
+    
+    [Fact]
     public void Execute_PrintStmt_OutputsCorrectEvaluatedExpression()
     {
         var reporter = Substitute.For<IReporter>();
@@ -246,4 +266,6 @@ public class TreeWalkInterpreterTests
         
         reporter.Received().Output("67");
     }
+
+    #endregion
 }

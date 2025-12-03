@@ -17,3 +17,5 @@ public sealed record LiteralExpr(HobbleValue Value) : Expr
 }
 
 public sealed record UnaryExpr(Token Operator, Expr Right) : Expr;
+
+public sealed record VarExpr(Token Identifier) : Expr;

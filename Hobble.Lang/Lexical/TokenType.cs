@@ -22,10 +22,12 @@ public enum TokenType
     
     String,
     Number,
+    Identifier,
     
     True,
     False,
     Print,
+    Var,
     
     Error,
     Eof,

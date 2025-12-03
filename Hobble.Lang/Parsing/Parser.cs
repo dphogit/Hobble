@@ -41,12 +41,15 @@ public class Parser
         return expr;
     }
 
+    /// <summary>Parses the source into a statement node.</summary>
+    /// <param name="source">The source containing the string to parse.</param>
+    /// <returns>A parsed statement node according to the language's grammar.</returns>
     public Stmt ParseStatement(string source)
     {
         _scanner = new Scanner(source);
         
         Advance();
-        var stmt = Statement();
+        var stmt = Declaration();
         Consume(TokenType.Eof, "Expected EOF.");
         
         return stmt;
@@ -54,6 +57,22 @@ public class Parser
 
     #region Statement Grammar
 
+    private Stmt Declaration()
+    {
+        if (Match(TokenType.Var))
+            return VarDecl();
+
+        return Statement();
+    }
+
+    private VarStmt VarDecl()
+    {
+        var identifier = Consume(TokenType.Identifier, "Expect variable name.");
+        var initializer = Match(TokenType.Equal) ? Expression() : null;
+        ConsumeEndOfStatementSemiColon();
+        return new VarStmt(identifier, initializer);
+    }
+    
     private Stmt Statement()
     {
         if (Match(TokenType.Print))
@@ -150,6 +169,9 @@ public class Parser
         if (Match(TokenType.False))
             return LiteralExpr.False();
 
+        if (Match(TokenType.Identifier))
+            return new VarExpr(_prev);
+
         throw CreateParseError("Expected expression.");
     }
 
@@ -186,12 +208,12 @@ public class Parser
         }
     }
 
-    private void Consume(TokenType type, string failureMessage)
+    private Token Consume(TokenType type, string failureMessage)
     {
         if (Check(type))
         {
             Advance();
-            return;
+            return _prev;
         }
         
         throw CreateParseError(failureMessage);
