@@ -43,4 +43,25 @@ public class VariableEnvironmentTests
         
         Assert.Throws<UndefinedVariableError>(() => environment.Get("age"));
     }
+
+    [Fact]
+    public void Assign_ExistingVariable_UpdatesVariableValue()
+    {
+        const string identifier = "age";
+        var environment = new VariableEnvironment();
+        environment.Define(identifier, HobbleValue.Number(67));
+        
+        environment.Assign(identifier, HobbleValue.Number(69));
+        
+        var age = environment.Get(identifier);
+        Assert.Equal(HobbleValue.Number(69), age);
+    }
+
+    [Fact]
+    public void Assign_UndefinedVariable_ThrowsUndefinedVariableError()
+    {
+        var environment = new VariableEnvironment();
+        
+        Assert.Throws<UndefinedVariableError>(() => environment.Assign("age", HobbleValue.Number(67)));
+    }
 }

@@ -118,7 +118,8 @@ public class ParserTests
         
         var expr = parser.ParseExpression("(1 + 2) * 3");
         
-        var expectedLeft = new BinaryExpr(LiteralExpr.Number(1), _tokenFactory.Plus(), LiteralExpr.Number(2));
+        var innerLeft = new BinaryExpr(LiteralExpr.Number(1), _tokenFactory.Plus(), LiteralExpr.Number(2));
+        var expectedLeft = new GroupExpr(innerLeft);
         var expectedRight = LiteralExpr.Number(3);
         var expectedExpr = new BinaryExpr(expectedLeft, _tokenFactory.Star(), expectedRight);
         Assert.Equal(expectedExpr, expr);
@@ -146,6 +147,17 @@ public class ParserTests
         var expr = parser.ParseExpression(identifier);
         
         var expectedExpr = new VarExpr(_tokenFactory.Identifier(identifier));
+        Assert.Equal(expectedExpr, expr);
+    }
+
+    [Fact]
+    public void ParseExpression_Assignment_ReturnsAssignExpr()
+    {
+        var parser = new Parser();
+
+        var expr = parser.ParseExpression("x = 10");
+
+        var expectedExpr = new AssignExpr(_tokenFactory.Identifier("x"), LiteralExpr.Number(10));
         Assert.Equal(expectedExpr, expr);
     }
 

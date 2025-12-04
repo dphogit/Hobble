@@ -12,7 +12,7 @@ idioms and how the language works.
       * [Expressions](#expressions)
     * [Lexical Grammar](#lexical-grammar)
       * [Comments](#comments)
-  * [Operators](#operators)
+  * [Operators and Expressions](#operators-and-expressions)
     * [Arithmetic Operators](#arithmetic-operators)
       * [Addition Operator +](#addition-operator-)
       * [Subtraction Operator -](#subtraction-operator--)
@@ -30,6 +30,8 @@ idioms and how the language works.
       * [Logical Negation Operator `!`](#logical-negation-operator-)
       * [Logical And Operator `&&`](#logical-and-operator-)
       * [Logical Or Operator `||`](#logical-or-operator-)
+    * [Assignment Operators](#assignment-operators)
+      * [Simple Assignment](#simple-assignment)
     * [Operator Precedence](#operator-precedence)
   * [Statements](#statements)
     * [Variable Declaration Statements](#variable-declaration-statements)
@@ -90,7 +92,10 @@ by the [operator precedence table](#operator-precedence). We can see that as we 
 expressions, the precedence is increasing.
 
 ```ebnf
-expression     = logicalOr;
+expression     = assignment ;
+
+assignment     = ( IDENTIFIER "=" assignment )
+               | logicalOr ;
 
 logicalOr      = logicalAnd ( "||" | logicalAnd )* ;
 
@@ -151,9 +156,10 @@ Examples:
 var x = 1; // Inline comment
 ```
 
-## Operators
+## Operators and Expressions
 
-Operators allow the user to perform basic operations with the built-in value types.
+Operators allow the user to perform basic operations with the built-in value types. Expressions are constructed from
+a combination of operators and operands.
 
 ### Arithmetic Operators
 
@@ -334,6 +340,25 @@ print true && sayHello();
 // true
 ```
 
+### Assignment Operators
+
+#### Simple Assignment
+
+The simple `=` assignment operator assigns the value of the right operand to the left operand variable. The assignment
+expression result itself is the value that was assigned to the left operand.
+
+```hob
+var a;
+print a = 5;  // output: 5
+```
+
+The `=` assignment operator is **right-associative** unlike many other operators, that is:
+
+```hob
+a = b = c;
+a = (b = c);
+```
+
 ### Operator Precedence
 
 With expressions that contain multiple operators, the operators with higher precedence are evaluated before
@@ -348,6 +373,7 @@ the operators with lower precedence. The following table contains the operators 
 |     5      | `x == y`, `x != y`                   | Equality       |
 |     6      | `x && y`                             | Logical And    |
 |     7      | `x \|\| y`                           | Logical Or     |
+|     8      | `x = y`                              | Assignment     |
 
 Parentheses can be used to control the precedence of how an expression evaluates. Enclose an expression with
 parentheses to evaluate the enclosing expression before any other evaluation happens outside the parentheses.

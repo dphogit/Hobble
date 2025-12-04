@@ -7,7 +7,7 @@ namespace Hobble.Lang.Interpreter;
 
 public class TreeWalkInterpreter(IReporter reporter)
 {
-    private VariableEnvironment _globalVariables = new();
+    private readonly VariableEnvironment _globalVariables = new();
     
     public TreeWalkInterpreter() : this(new ConsoleReporter()) { }
     
@@ -51,12 +51,21 @@ public class TreeWalkInterpreter(IReporter reporter)
     {
         return expression switch
         {
+            AssignExpr assignExpr => EvaluateAssignExpr(assignExpr),
             BinaryExpr binaryExpr => EvaluateBinaryExpr(binaryExpr),
+            GroupExpr groupExpr => Evaluate(groupExpr.Expr),
             LiteralExpr literalExpr => literalExpr.Value,
             UnaryExpr unaryExpr => EvaluateUnaryExpr(unaryExpr),
             VarExpr varExpr => EvaluateVarExpr(varExpr),
             _ => throw new ArgumentException($"Invalid expression type {expression.GetType()}")
         };
+    }
+
+    private HobbleValue EvaluateAssignExpr(AssignExpr assignExpr)
+    {
+        var value = Evaluate(assignExpr.Value);
+        _globalVariables.Assign(assignExpr.Identifier.Lexeme, value);
+        return value;
     }
     
     private HobbleValue EvaluateBinaryExpr(BinaryExpr binaryExpr)

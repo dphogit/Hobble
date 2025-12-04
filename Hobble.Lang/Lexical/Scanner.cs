@@ -37,43 +37,24 @@ public class Scanner(string source)
         if (IsHobbleAlpha(c))
             return Identifier();
 
-        switch (c)
+        return c switch
         {
-            case '+':
-                return _tokenFactory.Plus();
-            case '-':
-                return _tokenFactory.Minus();
-            case '*':
-                return _tokenFactory.Star();
-            case '/':
-                return _tokenFactory.Slash();
-            case '(':
-                return _tokenFactory.LeftParen();
-            case ')':
-                return _tokenFactory.RightParen();
-            case '!':
-                return Match('=') ? _tokenFactory.BangEqual() : _tokenFactory.Bang();
-            case '<':
-                return Match('=') ? _tokenFactory.LessThanEqual() : _tokenFactory.LessThan();
-            case '>':
-                return Match('=') ? _tokenFactory.GreaterThanEqual() : _tokenFactory.GreaterThan();
-            case '=':
-                return Match('=') ? _tokenFactory.EqualEqual() : _tokenFactory.Equal();
-            case '&':
-                return Match('&')
-                    ? _tokenFactory.AmpAmp()
-                    : _tokenFactory.Error("Logical AND requires two ampersands.");
-            case '|':
-                return Match('|')
-                    ? _tokenFactory.PipePipe()
-                    : _tokenFactory.Error("Logical OR requires two ampersands.");
-            case ';':
-                return _tokenFactory.SemiColon();
-            case '"':
-                return String();
-            default:
-                return _tokenFactory.Error($"Unexpected character '{c}'.");
-        }
+            '+' => _tokenFactory.Plus(),
+            '-' => _tokenFactory.Minus(),
+            '*' => _tokenFactory.Star(),
+            '/' => _tokenFactory.Slash(),
+            '(' => _tokenFactory.LeftParen(),
+            ')' => _tokenFactory.RightParen(),
+            '!' => Match('=') ? _tokenFactory.BangEqual() : _tokenFactory.Bang(),
+            '<' => Match('=') ? _tokenFactory.LessThanEqual() : _tokenFactory.LessThan(),
+            '>' => Match('=') ? _tokenFactory.GreaterThanEqual() : _tokenFactory.GreaterThan(),
+            '=' => Match('=') ? _tokenFactory.EqualEqual() : _tokenFactory.Equal(),
+            '&' => Match('&') ? _tokenFactory.AmpAmp() : _tokenFactory.Error("Logical AND requires two ampersands."),
+            '|' => Match('|') ? _tokenFactory.PipePipe() : _tokenFactory.Error("Logical OR requires two ampersands."),
+            ';' => _tokenFactory.SemiColon(),
+            '"' => String(),
+            _ => _tokenFactory.Error($"Unexpected character '{c}'.")
+        };
     }
 
     private Token Number()

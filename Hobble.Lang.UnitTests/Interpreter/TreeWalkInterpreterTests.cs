@@ -141,7 +141,8 @@ public class TreeWalkInterpreterTests
         
         // 6 / (3 - 1) = 3
         var left = LiteralExpr.Number(6);
-        var right = new BinaryExpr(LiteralExpr.Number(3), _tokenFactory.Slash(), LiteralExpr.Number(1));
+        var rightInner = new BinaryExpr(LiteralExpr.Number(3), _tokenFactory.Slash(), LiteralExpr.Number(1));
+        var right = new GroupExpr(rightInner);
         var expr  = new BinaryExpr(left, _tokenFactory.Minus(), right);
         
         var result = interpreter.Evaluate(expr);
@@ -250,7 +251,30 @@ public class TreeWalkInterpreterTests
         var expectedResult = HobbleValue.Number(67);
         Assert.Equal(expectedResult, result);
     }
-    
+
+    [Fact]
+    public void Evaluate_Assignment_ReturnsUpdatedValue()
+    {
+        var identifier = _tokenFactory.Identifier("age");
+        var interpreter = new TreeWalkInterpreter();
+        var varDecl = new VarStmt(identifier, LiteralExpr.Number(67));
+        interpreter.Execute(varDecl);
+
+        var result = interpreter.Evaluate(new AssignExpr(identifier, LiteralExpr.Number(69)));
+        
+        var expectedResult = HobbleValue.Number(69);
+        Assert.Equal(expectedResult, result);
+    }
+
+    [Fact]
+    public void Evaluate_AssignmentUndefinedVariable_ThrowsRuntimeError()
+    {
+        var interpreter = new TreeWalkInterpreter();
+        var assignExpr = new AssignExpr(_tokenFactory.Identifier("age"), LiteralExpr.Number(67));
+
+        Assert.ThrowsAny<RuntimeError>(() => interpreter.Evaluate(assignExpr));
+    }
+
     #endregion
 
     #region Statement Execution

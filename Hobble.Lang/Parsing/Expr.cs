@@ -5,7 +5,11 @@ namespace Hobble.Lang.Parsing;
 
 public abstract record Expr;
 
+public sealed record AssignExpr(Token Identifier, Expr Value) : Expr;
+
 public sealed record BinaryExpr(Expr Left, Token Operator, Expr Right) : Expr;
+
+public sealed record GroupExpr(Expr Expr) : Expr;
 
 public sealed record LiteralExpr(HobbleValue Value) : Expr
 {

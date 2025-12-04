@@ -101,7 +101,25 @@ public class Parser
 
     private Expr Expression()
     {
-        return LogicalOr();
+        return Assignment();
+    }
+
+    private Expr Assignment()
+    {
+        var expr = LogicalOr();
+
+        if (!Match(TokenType.Equal))
+            return expr;
+
+        // Assignment detected, convert expr which was an r-value into an l-value (assignment target).
+        // This conversion is only valid if the assignment target is valid (a VarExpr syntax node).
+        
+        var assignOp = _prev;
+        var value = Assignment();
+        
+        return expr is VarExpr varExpr
+            ? new AssignExpr(varExpr.Identifier, value)
+            : throw CreateParseError(assignOp, "Invalid assignment target");
     }
 
     private Expr LogicalOr()
@@ -160,7 +178,7 @@ public class Parser
         {
             var expr = Expression();
             Consume(TokenType.RightParen, "Expected closing ')' at end of expression.");
-            return expr;
+            return new GroupExpr(expr);
         }
 
         if (Match(TokenType.True))
@@ -240,7 +258,12 @@ public class Parser
 
     private ParseError CreateParseError(string message)
     {
-        _reporter.Error(_current, message);
+        return CreateParseError(_current, message);
+    }
+
+    private ParseError CreateParseError(Token token, string message)
+    {
+        _reporter.Error(token, message);
         return new ParseError(message);
     }
 }

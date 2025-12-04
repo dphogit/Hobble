@@ -28,6 +28,14 @@ public class VariableEnvironment
 
         throw new UndefinedVariableError(name);
     }
+
+    public void Assign(string name, HobbleValue value)
+    {
+        if (!_variables.ContainsKey(name))
+            throw new UndefinedVariableError(name);
+        
+        _variables[name]  = value;
+    }
 }
 
 public class VariableAlreadyDefinedError(string name) : RuntimeError($"Variable '{name}' is already defined.");
