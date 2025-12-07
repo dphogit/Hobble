@@ -42,6 +42,7 @@ idioms and how the language works.
       * [If Statements](#if-statements)
     * [Iterative Statements](#iterative-statements)
       * [While Statement](#while-statement)
+      * [For Statement](#for-statement)
   * [Variables](#variables-)
     * [Local Variables and Lexical Scope](#local-variables-and-lexical-scope)
 <!-- TOC -->
@@ -99,6 +100,11 @@ printStmt = "print" expression ";" ;
 ifStmt    = "if" "(" expression ")" statement ( "else" statement )? ;
 
 whileStmt = "while" "(" expression ")" statement ;
+
+forStmt   = "for" "(" ( varDecl | exprStmt | ";" )
+                      expression? ";"
+                      expression?
+                  ")" statement ;
 
 block     = "{" declaration* } ;
 ```
@@ -503,6 +509,33 @@ var i = 0;
 while (i < 3) {
   print i;
   i = i + 1;
+}
+// output:
+// 0
+// 1
+// 2
+```
+
+#### For Statement
+
+The `for` statement evaluates an initialisation expression, then while a condition is true it repeatedly executes a
+statement or block of statements. At the end of each iteration, an increment expression is evaluated.
+
+Within the parenthesis of the `for` statement contains three clauses to implement the above described behaviour of the
+`for` loop:
+
+1. The first clause is the *initialiser*. The optional initialiser can be used to evaluate an expression, commonly used
+to assign to a variable. The initialiser can alternatively be used to define a local variable scoped to the loop's body.
+The initialiser is executed once before anything else in the loop.
+2. The second clause is the *condition*. This condition when evaluated to `true` executes the loop's body. The condition
+must evaluate to a Bool type otherwise a runtime error occurs. If a condition is not given, then it defaults to `true`.
+3. The third clause is the *increment*. It is an optional arbitrary expression that evaluates at the end of each
+iteration. In practice, when executed it would usually have a side effect to be impactful to the loop, for example
+updating the value of a variable that is used in the condition clause so that the loop guarantees to end.
+
+```hob
+for (var i = 0; i < 3; i = i + 1) {
+  print i;
 }
 // output:
 // 0

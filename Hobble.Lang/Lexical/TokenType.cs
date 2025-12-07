@@ -33,6 +33,7 @@ public enum TokenType
     If,
     Else,
     While,
+    For,
     
     Error,
     Eof,

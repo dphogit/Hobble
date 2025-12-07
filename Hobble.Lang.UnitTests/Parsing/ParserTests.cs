@@ -256,6 +256,35 @@ public class ParserTests
         var expectedStmt = new WhileStmt(LiteralExpr.True(), new PrintStmt(LiteralExpr.Number(1)));
         Assert.Equal(expectedStmt, stmt);
     }
+
+    [Fact]
+    public void ParseStatement_ForLoop_DesugarsIntoBlockAndWhileStmt()
+    {
+        var parser = new Parser();
+
+        var stmt = parser.ParseStatement("for (var i = 0; i < 3; i = i + 1) print i;");
+        
+        /*
+         * The for loop should desugar into:
+         * {
+         *   var i = 0;         // initializer
+         *   while (i < 3) {    // a block is created to capture the existing body statement and increment
+         *     print i;
+         *     i = i + 1; 
+         *   }
+         * }
+         */
+
+        var i = _tokenFactory.Identifier("i");
+        var iExpr = new VarExpr(i);
+        var initializer = new VarStmt(i, LiteralExpr.Number(0));
+        var condition = new BinaryExpr(iExpr, _tokenFactory.LessThan(), LiteralExpr.Number(3));
+        var increment = new AssignExpr(i, new BinaryExpr(iExpr, _tokenFactory.Plus(), LiteralExpr.Number(1)));
+        var whileBody = new BlockStmt([new PrintStmt(iExpr), new ExprStmt(increment)]);
+        var expectedStmt = new BlockStmt([initializer, new WhileStmt(condition, whileBody)]);
+        
+        Assert.Equal(expectedStmt, stmt);
+    }
     
     #endregion
 

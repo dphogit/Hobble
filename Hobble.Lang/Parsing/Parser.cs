@@ -114,6 +114,9 @@ public class Parser
         if (Match(TokenType.While))
             return WhileStmt();
 
+        if (Match(TokenType.For))
+            return ForStmt();
+
         return ExprStmt();
     }
 
@@ -158,6 +161,50 @@ public class Parser
         var body = Statement();
         
         return new WhileStmt(condition, body);
+    }
+
+    // The for loop desugars into a WhileStmt or BlockStmt syntax node depending on the clauses
+    // given in the for loop source.
+    private Stmt ForStmt()
+    {
+        Consume(TokenType.LeftParen, "Expect '(' after 'for'.");
+        
+        var initializer = GetForInitializer();
+
+        // If no condition is given, it defaults to `true`.
+        var condition = Check(TokenType.SemiColon) ? LiteralExpr.True() : Expression();
+        Consume(TokenType.SemiColon, "Expect ';' after for condition.");
+
+        var increment = Check(TokenType.RightParen) ? null : Expression();
+        Consume(TokenType.RightParen, "Expect ')' after for clauses.");
+
+        var body = Statement();
+
+        // If we have an increment, replace the existing body with a new block that has the
+        // existing block then followed by the increment statement.
+        if (increment is not null)
+        {
+            body = new BlockStmt([body, new ExprStmt(increment)]);
+        }
+
+        var whileStmt = new WhileStmt(condition, body);
+
+        // If we have an initialiser then we create a new block to correctly scope possible local
+        // variable declarations to the loop only.
+        return initializer is null
+            ? whileStmt
+            : new BlockStmt([initializer, whileStmt]);
+    }
+
+    private Stmt? GetForInitializer()
+    {
+        if (Match(TokenType.Var))
+            return VarDecl();
+        
+        if (Match(TokenType.SemiColon))
+            return null;
+        
+        return ExprStmt();
     }
     
     private ExprStmt ExprStmt()

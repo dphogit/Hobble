@@ -12,11 +12,13 @@ public static class Keywords
         { "var", TokenType.Var },
         { "if", TokenType.If },
         { "else", TokenType.Else },
-        { "while", TokenType.While }
+        { "while", TokenType.While },
+        { "for", TokenType.For },
     };
 
     private static readonly HashSet<TokenType> StatementStarters =
     [
+        TokenType.For,
         TokenType.If,
         TokenType.Print,
         TokenType.While,

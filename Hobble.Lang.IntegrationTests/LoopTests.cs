@@ -5,7 +5,7 @@ namespace Hobble.Lang.IntegrationTests;
 public class LoopTests : BaseIntegrationTests
 {
     [Fact]
-    public void While_ExecutesCorrectNumberIterations()
+    public void While()
     {
         const string source = """
                               var sum = 0;
@@ -23,7 +23,7 @@ public class LoopTests : BaseIntegrationTests
     }
 
     [Fact]
-    public void While_AssignmentInCondition_ExecutesCorrectNumberIterations()
+    public void While_AssignmentInCondition()
     {
         const string source = """
                               var sum = 0;
@@ -31,6 +31,56 @@ public class LoopTests : BaseIntegrationTests
                               
                               while ((i = i + 1) < 3)
                                 sum = sum + i;
+                              
+                              print sum;    // expect: 3
+                              """;
+        
+        ReporterActionTest(source, reporter => reporter.Received(1).Output("3"));
+    }
+
+    [Fact]
+    public void For()
+    {
+        const string source = """
+                              var sum = 0;
+                              
+                              for (var i = 0; i < 3; i = i + 1) {
+                                sum = sum + i;
+                              }
+                              
+                              print sum;    // expect: 3
+                              """;
+        
+        ReporterActionTest(source, reporter => reporter.Received(1).Output("3"));
+    }
+
+    [Fact]
+    public void For_NoInitializer()
+    {
+        const string source = """
+                              var i = 0;
+                              var sum = 0;
+                              
+                              for (; i < 3; i = i + 1) {
+                                sum = sum + i;
+                              }
+                              
+                              print sum;    // expect: 3
+                              """;
+        
+        ReporterActionTest(source, reporter => reporter.Received(1).Output("3"));
+    }
+
+    [Fact]
+    public void For_NoIncrement()
+    {
+        const string source = """
+                              var sum = 0;
+
+                              for (var i = 0; i < 3; ) {
+                                sum = sum + i;
+                                i = i + 1;
+                              }
                               
                               print sum;    // expect: 3
                               """;
