@@ -37,6 +37,8 @@ idioms and how the language works.
     * [Variable Declaration Statements](#variable-declaration-statements)
     * [Expression Statements](#expression-statements)
     * [Print Statements](#print-statements)
+    * [Selection Statements](#selection-statements)
+      * [If Statements](#if-statements)
   * [Variables](#variables-)
     * [Local Variables and Lexical Scope](#local-variables-and-lexical-scope)
 <!-- TOC -->
@@ -85,11 +87,13 @@ varDecl     = "var" IDENTIFIER ( "=" expression )? ";" ;
 The remaining statements which aren't declarations, produce side effects without creating bindings.
 
 ```ebnf
-statement = exprStmt | printStmt | block ;
+statement = exprStmt | printStmt | ifStmt | block ;
 
 exprStmt  = expression ";" ;
 
 printStmt = "print" expression ";" ;
+
+ifStmt    = "if" "(" expression ")" statement ( "else" statement )? ;
 
 block     = "{" declaration* } ;
 ```
@@ -437,6 +441,44 @@ Evaluates an expression and outputs the result to the user.
 ```hob
 print 1 + 2;  // output: 3
 print 5 * 9;  // output: 45
+```
+
+### Selection Statements
+
+Selection statements select certain statements to execute based on some value of a provided expression.
+
+#### If Statements
+
+The `if` statement executes a statement if the Boolean expression evaluates to `true`.
+
+```hob
+fn calculateCircleArea(radius) {
+  if (radius < 0) {
+    print "Warning: Radius is negative."; 
+  }
+  
+  print 3.14 * radius * radius;
+}
+
+calculateCircleArea(-10);
+// output:
+// Warning: Radius is negative.
+// 314
+```
+
+An `if-else` statement allows one of two code paths to be chosen based on the evaluation of the Boolean expression.
+
+```hob
+fn isWaterFreezing(tempCelsius) {
+  if (tempCelsius <= 0) {
+    print true; 
+  } else {
+    print false; 
+  }
+}
+
+isWaterFreezing(-10);   // output: true
+isWaterFreezing(10);    // output: false
 ```
 
 ## Variables 

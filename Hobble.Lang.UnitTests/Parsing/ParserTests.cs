@@ -219,6 +219,32 @@ public class ParserTests
         var expectedStmt = new BlockStmt([]);
         Assert.Equal(expectedStmt, stmt);
     }
+
+    [Fact]
+    public void ParseStatement_If_ReturnsIfStmt()
+    {
+        var parser = new Parser();
+
+        var stmt = parser.ParseStatement("if (true) print 1;");
+
+        var expectedStmt = new IfStmt(LiteralExpr.True(), new PrintStmt(LiteralExpr.Number(1)));
+        Assert.Equal(expectedStmt, stmt);
+    }
+
+    [Fact]
+    public void ParseStatement_IfElse_ReturnsIfStmt()
+    {
+        var parser  = new Parser();
+        
+        var stmt = parser.ParseStatement("if (true) print 1; else print 2;");
+
+        var expectedStmt = new IfStmt(
+            LiteralExpr.True(),
+            new PrintStmt(LiteralExpr.Number(1)),
+            new PrintStmt(LiteralExpr.Number(2)));
+        
+        Assert.Equal(expectedStmt, stmt);
+    }
     
     #endregion
 

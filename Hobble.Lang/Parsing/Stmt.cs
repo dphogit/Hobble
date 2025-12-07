@@ -19,6 +19,8 @@ public sealed record BlockStmt(IList<Stmt> Stmts) : Stmt
 
 public sealed record ExprStmt(Expr Expr) : Stmt;
 
+public sealed record IfStmt(Expr Condition, Stmt Then, Stmt? Else = null) : Stmt;
+
 public sealed record PrintStmt(Expr Expr) : Stmt;
 
 public sealed record VarStmt(Token Identifier, Expr? Initializer = null) : Stmt;

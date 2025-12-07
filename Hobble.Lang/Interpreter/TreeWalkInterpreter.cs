@@ -39,6 +39,9 @@ public class TreeWalkInterpreter(IReporter reporter)
             case ExprStmt exprStmt:
                 Evaluate(exprStmt.Expr);
                 return;
+            case IfStmt ifStmt:
+                ExecuteIfStmt(ifStmt);
+                return;
             case PrintStmt printStmt:
                 ExecutePrintStmt(printStmt);
                 return;
@@ -67,6 +70,19 @@ public class TreeWalkInterpreter(IReporter reporter)
         {
             _environment = previousEnvironment;
         }
+    }
+
+    private void ExecuteIfStmt(IfStmt ifStmt)
+    {
+        var conditionResult = Evaluate(ifStmt.Condition);
+
+        if (!conditionResult.IsBool())
+            throw new RuntimeError("Evaluated condition must be of type Bool.");
+
+        if (conditionResult.AsBool())
+            Execute(ifStmt.Then);
+        else if (ifStmt.Else is not null)
+            Execute(ifStmt.Else);
     }
 
     private void ExecutePrintStmt(PrintStmt printStmt)

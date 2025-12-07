@@ -13,6 +13,8 @@ public class TokenFactory(int line = 1)
     public Token True() => Create("true", TokenType.True);
     public Token False() => Create("false", TokenType.False);
     public Token Var() => Create("var", TokenType.Var);
+    public Token If() => Create("if", TokenType.If);
+    public Token Else() => Create("else", TokenType.Else);
 
     public Token Plus() => Create("+", TokenType.Plus);
     public Token Minus() => Create("-", TokenType.Minus);
@@ -67,6 +69,8 @@ public class TokenFactory(int line = 1)
             "false" => False(),
             "true" => True(),
             "var" => Var(),
+            "if" => If(),
+            "else" => Else(),
             _ => throw new ArgumentException($"Unknown token to create from '{s}'")
         };
     }

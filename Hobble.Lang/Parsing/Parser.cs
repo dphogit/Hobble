@@ -108,6 +108,9 @@ public class Parser
         if (Match(TokenType.LeftBrace))
             return Block();
 
+        if (Match(TokenType.If))
+            return IfStmt();
+
         return ExprStmt();
     }
 
@@ -131,6 +134,18 @@ public class Parser
         return new BlockStmt(stmts);
     }
 
+    private IfStmt IfStmt()
+    {
+        Consume(TokenType.LeftParen, "Expect '(' after 'if'.");
+        var condition = Expression();
+        Consume(TokenType.RightParen, "Expect ')' after if condition.");
+        
+        var thenBranch = Statement();
+        var elseBranch = Match(TokenType.Else) ? Statement() : null;
+        
+        return new IfStmt(condition, thenBranch, elseBranch);
+    }
+    
     private ExprStmt ExprStmt()
     {
         var expr = Expression();

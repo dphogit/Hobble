@@ -304,5 +304,41 @@ public class TreeWalkInterpreterTests
         reporter.Received(1).Output(Arg.Is("2"));
     }
 
+    [Fact]
+    public void Execute_IfStmtConditionTrue_OutputsThenBranch()
+    {
+        var reporter = Substitute.For<IReporter>();
+        var interpreter = new TreeWalkInterpreter(reporter);
+        var stmt = new IfStmt(LiteralExpr.True(), new PrintStmt(LiteralExpr.Number(67)));
+        
+        interpreter.Execute(stmt);
+        
+        reporter.Received(1).Output(Arg.Is("67"));
+    }
+
+    [Fact]
+    public void Execute_IfStmtConditionFalse_OutputsElseBranch()
+    {
+        var reporter = Substitute.For<IReporter>();
+        var interpreter = new TreeWalkInterpreter(reporter);
+        var stmt = new IfStmt(
+            LiteralExpr.False(),
+            new PrintStmt(LiteralExpr.Number(67)),
+            new PrintStmt(LiteralExpr.Number(69)));
+        
+        interpreter.Execute(stmt);
+        
+        reporter.Received(1).Output(Arg.Is("69"));
+    }
+
+    [Fact]
+    public void Execute_IfStmtNonBoolCondition_ThrowsRuntimeError()
+    {
+        var stmt = new IfStmt(LiteralExpr.Number(1), new PrintStmt(LiteralExpr.Number(1)));
+        var interpreter = new TreeWalkInterpreter();
+        
+        Assert.Throws<RuntimeError>(() => interpreter.Execute(stmt));
+    }
+
     #endregion
 }

@@ -30,6 +30,8 @@ public enum TokenType
     False,
     Print,
     Var,
+    If,
+    Else,
     
     Error,
     Eof,

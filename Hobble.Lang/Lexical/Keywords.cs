@@ -10,13 +10,16 @@ public static class Keywords
         { "true", TokenType.True },
         { "print", TokenType.Print },
         { "var", TokenType.Var },
+        { "if", TokenType.If },
+        { "else", TokenType.Else }
     };
 
-    private static readonly HashSet<TokenType> StatementStarters = new()
-    {
-        TokenType.Var,
-        TokenType.Print
-    };
+    private static readonly HashSet<TokenType> StatementStarters =
+    [
+        TokenType.If,
+        TokenType.Print,
+        TokenType.Var
+    ];
 
     public static bool TryGetTokenType(string keyword, [NotNullWhen(true)] out TokenType? tokenType)
     {
