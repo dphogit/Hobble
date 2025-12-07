@@ -17,6 +17,9 @@ public class Parser
     
     private readonly IReporter _reporter;
 
+    /// <summary>True when an error is detected after parsing the program.</summary>
+    public bool HadError;
+
     public Parser() : this(new ConsoleReporter()) { }
 
     public Parser(IReporter reporter)
@@ -27,14 +30,39 @@ public class Parser
         _current = null!;
     }
 
+    /// <summary>Parses the source into the parse tree representing the program's syntactical structure.</summary>
+    /// <param name="source">The program source to parse.</param>
+    /// <returns>A parse tree representing the program.</returns>
+    public ParseTree ParseProgram(string source)
+    {
+        List<Stmt> stmts = [];
+        
+        InitScanner(source);        
+
+        while (!Match(TokenType.Eof))
+        {
+            try
+            {
+                var stmt = Declaration();
+                stmts.Add(stmt);
+            }
+            catch (ParseError)
+            {
+                HadError = true;
+                Synchronize();
+            }
+        }
+
+        return new ParseTree(stmts);
+    }
+
     /// <summary>Parses the source into an expression tree.</summary>
     /// <param name="source">The expression to parse.</param>
     /// <returns>An expression tree according to the language's grammar.</returns>
     public Expr ParseExpression(string source)
     {
-        _scanner = new Scanner(source);
+        InitScanner(source);
         
-        Advance();
         var expr = Expression();
         Consume(TokenType.Eof, "Expected EOF.");
 
@@ -46,9 +74,8 @@ public class Parser
     /// <returns>A parsed statement node according to the language's grammar.</returns>
     public Stmt ParseStatement(string source)
     {
-        _scanner = new Scanner(source);
+        InitScanner(source);
         
-        Advance();
         var stmt = Declaration();
         Consume(TokenType.Eof, "Expected EOF.");
         
@@ -78,6 +105,9 @@ public class Parser
         if (Match(TokenType.Print))
             return PrintStmt();
 
+        if (Match(TokenType.LeftBrace))
+            return Block();
+
         return ExprStmt();
     }
 
@@ -86,6 +116,19 @@ public class Parser
         var expr = Expression();
         ConsumeEndOfStatementSemiColon();
         return new PrintStmt(expr);
+    }
+
+    private BlockStmt Block()
+    {
+        List<Stmt> stmts = [];
+        
+        while (!Check(TokenType.RightBrace) && _current.Type != TokenType.Eof)
+        {
+            stmts.Add(Declaration());
+        }
+
+        Consume(TokenType.RightBrace, "Expected '}' at end of block.");
+        return new BlockStmt(stmts);
     }
 
     private ExprStmt ExprStmt()
@@ -209,6 +252,12 @@ public class Parser
 
     #endregion
 
+    private void InitScanner(string source)
+    {
+        _scanner = new Scanner(source);
+        Advance();
+    }
+    
     private void Advance()
     {
         _prev = _current;
@@ -217,12 +266,11 @@ public class Parser
         {
             _current = _scanner.NextToken();
 
-            if (_current.Type == TokenType.Error)
-            {
-                throw CreateParseError(_current.Lexeme);
-            }
+            if (_current.Type != TokenType.Error)
+                return;
 
-            return;
+            HadError = true;
+            _reporter.Error(_current, _current.Lexeme);
         }
     }
 
@@ -265,5 +313,25 @@ public class Parser
     {
         _reporter.Error(token, message);
         return new ParseError(message);
+    }
+
+    /// <summary>
+    /// Moves forward and discards tokens until next statement boundary. This gives a good user experience in trying to
+    /// give back as many errors as possible at once rather than one at a time, while also a best effort at preventing
+    /// errors cascading into future separate errors.
+    /// </summary>
+    private void Synchronize()
+    {
+        while (_current.Type != TokenType.Eof)
+        {
+            _prev = _current;
+            _current = _scanner.NextToken();
+
+            if (_prev.Type == TokenType.SemiColon)
+                return;
+            
+            if (Keywords.IsStatementStarter(_current.Type))
+                return;
+        }
     }
 }

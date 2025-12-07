@@ -6,5 +6,7 @@ public interface IReporter
 {
     void Error(Token token, string message);
 
+    void Error(string message);
+
     void Output(string message);
 }

@@ -37,9 +37,45 @@ public class VariableEnvironmentTests
     }
 
     [Fact]
+    public void Get_DefinedInParentEnvironment_ReturnsStoredValue()
+    {
+        var parentEnvironment = new VariableEnvironment();
+        parentEnvironment.Define("age", HobbleValue.Number(67));
+        
+        var environment = new VariableEnvironment(parentEnvironment);
+        
+        var age = environment.Get("age");
+        
+        Assert.Equal(HobbleValue.Number(67), age);
+    }
+
+    [Fact]
+    public void Get_VariableShadowsParent_ReturnsShadowedValue()
+    {
+        var parentEnvironment = new VariableEnvironment();
+        parentEnvironment.Define("age", HobbleValue.Number(67));
+        
+        var environment = new VariableEnvironment(parentEnvironment);
+        environment.Define("age", HobbleValue.Number(69));
+        
+        var age = environment.Get("age");
+        
+        Assert.Equal(HobbleValue.Number(69), age);
+    }
+
+    [Fact]
     public void Get_UndefinedVariable_ThrowsUndefinedVariableError()
     {
         var environment = new VariableEnvironment();
+        
+        Assert.Throws<UndefinedVariableError>(() => environment.Get("age"));
+    }
+
+    [Fact]
+    public void Get_UndefinedVariableWithParent_ThrowsUndefinedVariableError()
+    {
+        var parentEnvironment = new VariableEnvironment();
+        var environment = new VariableEnvironment(parentEnvironment);
         
         Assert.Throws<UndefinedVariableError>(() => environment.Get("age"));
     }
@@ -58,9 +94,32 @@ public class VariableEnvironmentTests
     }
 
     [Fact]
+    public void Assign_VariableInParent_UpdatesVariableValue()
+    {
+        var parentEnvironment = new VariableEnvironment();
+        parentEnvironment.Define("age", HobbleValue.Number(67));
+        
+        var environment = new VariableEnvironment(parentEnvironment);
+        
+        environment.Assign("age", HobbleValue.Number(69));
+        
+        var age = parentEnvironment.Get("age");
+        Assert.Equal(HobbleValue.Number(69), age);
+    }
+
+    [Fact]
     public void Assign_UndefinedVariable_ThrowsUndefinedVariableError()
     {
         var environment = new VariableEnvironment();
+        
+        Assert.Throws<UndefinedVariableError>(() => environment.Assign("age", HobbleValue.Number(67)));
+    }
+    
+    [Fact]
+    public void Assign_UndefinedVariableWithParent_ThrowsUndefinedVariableError()
+    {
+        var parentEnvironment = new VariableEnvironment();
+        var environment = new VariableEnvironment(parentEnvironment);
         
         Assert.Throws<UndefinedVariableError>(() => environment.Assign("age", HobbleValue.Number(67)));
     }

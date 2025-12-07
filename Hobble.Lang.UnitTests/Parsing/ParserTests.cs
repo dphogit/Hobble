@@ -209,5 +209,64 @@ public class ParserTests
         Assert.Equal(expectedStmt, stmt);
     }
 
+    [Fact]
+    public void ParseStatement_EmptyBlock_ReturnsBlockStmt()
+    {
+        var parser = new Parser();
+
+        var stmt = parser.ParseStatement("{}");
+
+        var expectedStmt = new BlockStmt([]);
+        Assert.Equal(expectedStmt, stmt);
+    }
+    
+    #endregion
+
+    #region Error Handling
+
+    [Fact]
+    public void ParseProgram_NoSemiColonEndOfStatement_FlagsError()
+    {
+        var parser = new Parser();
+
+        var parseTree = parser.ParseProgram("var x = 10");
+        
+        Assert.True(parser.HadError);
+        Assert.Empty(parseTree.Stmts);
+    }
+
+    [Fact]
+    public void ParseProgram_InvalidToken_FlagsError()
+    {
+        var parser = new Parser();
+
+        var parseTree = parser.ParseProgram("$");
+        
+        Assert.True(parser.HadError);
+        Assert.Empty(parseTree.Stmts);
+    }
+
+    [Fact]
+    public void ParseProgram_NoClosingBraceEndOfBlock_FlagsError()
+    {
+        var parser = new Parser();
+
+        var parseTree = parser.ParseProgram("{");
+        
+        Assert.True(parser.HadError);
+        Assert.Empty(parseTree.Stmts);
+    }
+
+    [Fact]
+    public void ParseProgram_MissingOperand_FlagsError()
+    {
+        var parser = new Parser();
+        
+        var parseTree = parser.ParseProgram("1 + ");
+        
+        Assert.True(parser.HadError);
+        Assert.Empty(parseTree.Stmts);
+    }
+
     #endregion
 }

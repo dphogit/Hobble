@@ -2,7 +2,7 @@
 
 namespace Hobble.Lang.Interpreter;
 
-public class VariableEnvironment
+public class VariableEnvironment(VariableEnvironment? parent = null)
 {
     private readonly Dictionary<string, HobbleValue> _variables = new();
 
@@ -26,15 +26,31 @@ public class VariableEnvironment
         if (_variables.TryGetValue(name, out var value))
             return value;
 
+        if (parent is not null)
+            return parent.Get(name);
+
         throw new UndefinedVariableError(name);
     }
 
+    /// <summary>Assign a value to a previously defined variable.</summary>
+    /// <param name="name">The variable identifier.</param>
+    /// <param name="value">The value to assign to the variable.</param>
+    /// <exception cref="UndefinedVariableError">The variable is not defined.</exception>
     public void Assign(string name, HobbleValue value)
     {
-        if (!_variables.ContainsKey(name))
-            throw new UndefinedVariableError(name);
+        if (_variables.ContainsKey(name))
+        {
+            _variables[name]  = value;
+            return;
+        }
+
+        if (parent is not null)
+        {
+            parent.Assign(name, value);
+            return;
+        }
         
-        _variables[name]  = value;
+        throw new UndefinedVariableError(name);
     }
 }
 

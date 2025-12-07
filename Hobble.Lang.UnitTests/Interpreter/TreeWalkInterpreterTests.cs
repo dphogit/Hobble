@@ -288,7 +288,20 @@ public class TreeWalkInterpreterTests
 
         interpreter.Execute(stmt);
         
-        reporter.Received().Output("67");
+        reporter.Received().Output(Arg.Is("67"));
+    }
+
+    [Fact]
+    public void Execute_BlockStmt_OutputsInnerStatements()
+    {
+        var reporter = Substitute.For<IReporter>();
+        var interpreter = new TreeWalkInterpreter(reporter);
+        var stmt = new BlockStmt([new PrintStmt(LiteralExpr.Number(1)), new PrintStmt(LiteralExpr.Number(2))]);
+        
+        interpreter.Execute(stmt);
+        
+        reporter.Received(1).Output(Arg.Is("1"));
+        reporter.Received(1).Output(Arg.Is("2"));
     }
 
     #endregion

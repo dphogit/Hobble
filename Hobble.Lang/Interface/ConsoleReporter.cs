@@ -6,13 +6,12 @@ public class ConsoleReporter : IReporter
 {
     public void Error(Token token, string message)
     {
-        var at = token.Type == TokenType.Eof ? "end" : $"'{token.Lexeme}'";
-        ReportError(token.Line, at, message);
+        Console.Error.WriteLine($"[Line {token.Line}] Error: {message}");
     }
 
-    private static void ReportError(int line, string at, string message)
+    public void Error(string message)
     {
-        Console.Error.WriteLine($"[Line {line}] Error at {at}: {message}");
+        Console.Error.WriteLine(message);
     }
 
     public void Output(string message)

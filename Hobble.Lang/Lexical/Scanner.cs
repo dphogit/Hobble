@@ -45,6 +45,8 @@ public class Scanner(string source)
             '/' => _tokenFactory.Slash(),
             '(' => _tokenFactory.LeftParen(),
             ')' => _tokenFactory.RightParen(),
+            '{' => _tokenFactory.LeftBrace(),
+            '}' => _tokenFactory.RightBrace(),
             '!' => Match('=') ? _tokenFactory.BangEqual() : _tokenFactory.Bang(),
             '<' => Match('=') ? _tokenFactory.LessThanEqual() : _tokenFactory.LessThan(),
             '>' => Match('=') ? _tokenFactory.GreaterThanEqual() : _tokenFactory.GreaterThan(),

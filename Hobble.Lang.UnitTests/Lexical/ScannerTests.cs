@@ -11,6 +11,8 @@ public class ScannerTests
     [InlineData("/", TokenType.Slash)]
     [InlineData("(", TokenType.LeftParen)]
     [InlineData(")", TokenType.RightParen)]
+    [InlineData("{", TokenType.LeftBrace)]
+    [InlineData("}", TokenType.RightBrace)]
     [InlineData("!", TokenType.Bang)]
     [InlineData("=", TokenType.Equal)]
     [InlineData("<", TokenType.LessThan)]

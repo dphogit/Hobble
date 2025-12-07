@@ -37,6 +37,8 @@ idioms and how the language works.
     * [Variable Declaration Statements](#variable-declaration-statements)
     * [Expression Statements](#expression-statements)
     * [Print Statements](#print-statements)
+  * [Variables](#variables-)
+    * [Local Variables and Lexical Scope](#local-variables-and-lexical-scope)
 <!-- TOC -->
 
 ## Types
@@ -63,7 +65,12 @@ We include the description of some of the special notation used.
 
 ### Syntax Grammar
 
-The syntax grammar parses a sequence of tokens into a tree structure the downstream to compute on.
+The syntax grammar parses a sequence of tokens into a tree structure the downstream to compute on. The first entrypoint
+production rule matches the Hobble program, which is a list of one or more declarations statements.
+
+```ebnf
+program = declaration* EOF;
+```
 
 #### Declarations and Statements
 
@@ -78,11 +85,13 @@ varDecl     = "var" IDENTIFIER ( "=" expression )? ";" ;
 The remaining statements which aren't declarations, produce side effects without creating bindings.
 
 ```ebnf
-statement = exprStmt | printStmt ;
+statement = exprStmt | printStmt | block ;
 
 exprStmt  = expression ";" ;
 
 printStmt = "print" expression ";" ;
+
+block     = "{" declaration* } ;
 ```
 
 #### Expressions
@@ -428,4 +437,54 @@ Evaluates an expression and outputs the result to the user.
 ```hob
 print 1 + 2;  // output: 3
 print 5 * 9;  // output: 45
+```
+
+## Variables 
+
+Variables are used to store values which are referred to or associated by user defined identifiers. These can then be
+later referred to throughout the program or scope it is declared/defined in.
+
+```hob
+var x = 10;   // The variable 'x' has the value 10
+print x;      // output: 10
+```
+
+### Local Variables and Lexical Scope
+
+The lifetime of a local variable is the portion of the program which storage is guaranteed to be reserved for it. The
+lifetime spans from the entry of the current scope it is in, until the end of the execution of that scope.
+
+Lexical scoping is used, which basically where a scope begins and end can be read from the program's source. The
+left curly brace `{` and right curly brace `}` are commonly used to indicate the beginning and closing of a scope
+respectively. Though these are not always required to be used (e.g. `if` statements).
+
+```hob
+// global scope
+
+var a = 10;
+
+{ // local scope 1
+  var a = 20;
+  print a; // output: 20
+} // end local scope 1
+
+{ // local scope 2
+  var a = 30;
+  print a; // output: 30
+} // end local scope 1
+
+print a;  // output: 10
+```
+
+A local variable is instantiated each time the scope is entered.
+
+```hob
+fn sayHello() {
+  var x = "Hello";
+  print x;
+}
+
+// Each call will have their own localised scope instantiation with each their own 'x' variable.
+sayHello(); // output: "Hello"
+sayHello(); // output: "Hello"
 ```

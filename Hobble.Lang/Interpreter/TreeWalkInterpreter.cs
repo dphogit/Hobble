@@ -7,9 +7,25 @@ namespace Hobble.Lang.Interpreter;
 
 public class TreeWalkInterpreter(IReporter reporter)
 {
-    private readonly VariableEnvironment _globalVariables = new();
+    private VariableEnvironment _environment = new();
     
     public TreeWalkInterpreter() : this(new ConsoleReporter()) { }
+
+    public bool HadRuntimeError;
+
+    public void Interpret(ParseTree parseTree)
+    {
+        try
+        {
+            foreach (var stmt in parseTree.Stmts)
+                Execute(stmt);
+        }
+        catch (RuntimeError error)
+        {
+            reporter.Error($"Runtime Error: {error.Message}");
+            HadRuntimeError = true;
+        }
+    }
     
     #region Statement Execution
 
@@ -17,6 +33,9 @@ public class TreeWalkInterpreter(IReporter reporter)
     {
         switch (stmt)
         {
+            case BlockStmt blockStmt:
+                ExecuteBlockStmt(blockStmt, new VariableEnvironment(_environment));
+                return;
             case ExprStmt exprStmt:
                 Evaluate(exprStmt.Expr);
                 return;
@@ -31,6 +50,25 @@ public class TreeWalkInterpreter(IReporter reporter)
         }
     }
 
+    private void ExecuteBlockStmt(BlockStmt blockStmt, VariableEnvironment environment)
+    {
+        // Keep reference to previous environment because it needs to be restored
+        // after executing the block statement with the passed environment.
+        var previousEnvironment = _environment;
+
+        try
+        {
+            _environment = environment;
+            
+            foreach (var stmt in blockStmt.Stmts)
+                Execute(stmt);
+        }
+        finally
+        {
+            _environment = previousEnvironment;
+        }
+    }
+
     private void ExecutePrintStmt(PrintStmt printStmt)
     {
         var result = Evaluate(printStmt.Expr);
@@ -40,7 +78,7 @@ public class TreeWalkInterpreter(IReporter reporter)
     private void ExecuteVarStmt(VarStmt varStmt)
     {
         var value = varStmt.Initializer is null ? HobbleValue.Null() : Evaluate(varStmt.Initializer);
-        _globalVariables.Define(varStmt.Identifier.Lexeme, value);
+        _environment.Define(varStmt.Identifier.Lexeme, value);
     }
     
     #endregion
@@ -64,7 +102,7 @@ public class TreeWalkInterpreter(IReporter reporter)
     private HobbleValue EvaluateAssignExpr(AssignExpr assignExpr)
     {
         var value = Evaluate(assignExpr.Value);
-        _globalVariables.Assign(assignExpr.Identifier.Lexeme, value);
+        _environment.Assign(assignExpr.Identifier.Lexeme, value);
         return value;
     }
     
@@ -203,7 +241,7 @@ public class TreeWalkInterpreter(IReporter reporter)
 
     private HobbleValue EvaluateVarExpr(VarExpr varExpr)
     {
-        return _globalVariables.Get(varExpr.Identifier.Lexeme);
+        return _environment.Get(varExpr.Identifier.Lexeme);
     }
     
     #endregion

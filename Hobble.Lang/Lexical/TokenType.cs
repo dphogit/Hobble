@@ -8,6 +8,8 @@ public enum TokenType
     Slash,
     LeftParen,
     RightParen,
+    LeftBrace,
+    RightBrace,
     Bang,
     Equal,
     LessThan,

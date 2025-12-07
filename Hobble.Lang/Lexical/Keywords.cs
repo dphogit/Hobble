@@ -12,6 +12,12 @@ public static class Keywords
         { "var", TokenType.Var },
     };
 
+    private static readonly HashSet<TokenType> StatementStarters = new()
+    {
+        TokenType.Var,
+        TokenType.Print
+    };
+
     public static bool TryGetTokenType(string keyword, [NotNullWhen(true)] out TokenType? tokenType)
     {
         if (TokenTypes.TryGetValue(keyword, out var type))
@@ -22,5 +28,10 @@ public static class Keywords
         
         tokenType = null;
         return false;
+    }
+
+    public static bool IsStatementStarter(TokenType type)
+    {
+        return StatementStarters.Contains(type);
     }
 }

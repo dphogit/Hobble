@@ -20,6 +20,8 @@ public class TokenFactory(int line = 1)
     public Token Slash() => Create("/", TokenType.Slash);
     public Token LeftParen() => Create("(", TokenType.LeftParen);
     public Token RightParen() => Create(")", TokenType.RightParen);
+    public Token LeftBrace() => Create("{", TokenType.LeftBrace);
+    public Token RightBrace() => Create("}", TokenType.RightBrace);
     public Token Bang() => Create("!", TokenType.Bang);
     public Token Equal() => Create("=", TokenType.Equal);
     public Token LessThan() => Create("<", TokenType.LessThan);
@@ -50,6 +52,8 @@ public class TokenFactory(int line = 1)
             "/" => Slash(),
             "(" => LeftParen(),
             ")" => RightParen(),
+            "{" => LeftBrace(),
+            "}" => RightBrace(),
             "=" => Equal(),
             "<" => LessThan(),
             ">" => GreaterThan(),
