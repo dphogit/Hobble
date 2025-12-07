@@ -245,6 +245,17 @@ public class ParserTests
         
         Assert.Equal(expectedStmt, stmt);
     }
+
+    [Fact]
+    public void ParseStatement_While_ReturnsWhileStmt()
+    {
+        var parser  = new Parser();
+
+        var stmt = parser.ParseStatement("while (true) print 1;");
+        
+        var expectedStmt = new WhileStmt(LiteralExpr.True(), new PrintStmt(LiteralExpr.Number(1)));
+        Assert.Equal(expectedStmt, stmt);
+    }
     
     #endregion
 

@@ -48,6 +48,9 @@ public class TreeWalkInterpreter(IReporter reporter)
             case VarStmt varStmt:
                 ExecuteVarStmt(varStmt);
                 return;
+            case WhileStmt whileStmt:
+                ExecuteWhileStmt(whileStmt);
+                return;
             default:
                 throw new ArgumentException($"Invalid statement type {stmt.GetType()}");
         }
@@ -74,12 +77,9 @@ public class TreeWalkInterpreter(IReporter reporter)
 
     private void ExecuteIfStmt(IfStmt ifStmt)
     {
-        var conditionResult = Evaluate(ifStmt.Condition);
+        CheckConditionIsBool(ifStmt.Condition, out var result);
 
-        if (!conditionResult.IsBool())
-            throw new RuntimeError("Evaluated condition must be of type Bool.");
-
-        if (conditionResult.AsBool())
+        if (result)
             Execute(ifStmt.Then);
         else if (ifStmt.Else is not null)
             Execute(ifStmt.Else);
@@ -95,6 +95,17 @@ public class TreeWalkInterpreter(IReporter reporter)
     {
         var value = varStmt.Initializer is null ? HobbleValue.Null() : Evaluate(varStmt.Initializer);
         _environment.Define(varStmt.Identifier.Lexeme, value);
+    }
+
+    private void ExecuteWhileStmt(WhileStmt whileStmt)
+    {
+        CheckConditionIsBool(whileStmt.Condition, out var result);
+        
+        while (result)
+        {
+            Execute(whileStmt.Body);
+            result = Evaluate(whileStmt.Condition).AsBool();
+        }
     }
     
     #endregion
@@ -261,4 +272,14 @@ public class TreeWalkInterpreter(IReporter reporter)
     }
     
     #endregion
+
+    private void CheckConditionIsBool(Expr condition, out bool result)
+    {
+        var conditionResult = Evaluate(condition);
+        
+        if (!conditionResult.IsBool())
+            throw new RuntimeError("Evaluated condition must be of type Bool.");
+        
+        result = conditionResult.AsBool();
+    }
 }

@@ -34,11 +34,14 @@ idioms and how the language works.
       * [Simple Assignment](#simple-assignment)
     * [Operator Precedence](#operator-precedence)
   * [Statements](#statements)
-    * [Variable Declaration Statements](#variable-declaration-statements)
+    * [Declaration Statements](#declaration-statements)
+      * [Variable Declaration Statements](#variable-declaration-statements)
     * [Expression Statements](#expression-statements)
     * [Print Statements](#print-statements)
     * [Selection Statements](#selection-statements)
       * [If Statements](#if-statements)
+    * [Iterative Statements](#iterative-statements)
+      * [While Statement](#while-statement)
   * [Variables](#variables-)
     * [Local Variables and Lexical Scope](#local-variables-and-lexical-scope)
 <!-- TOC -->
@@ -87,13 +90,15 @@ varDecl     = "var" IDENTIFIER ( "=" expression )? ";" ;
 The remaining statements which aren't declarations, produce side effects without creating bindings.
 
 ```ebnf
-statement = exprStmt | printStmt | ifStmt | block ;
+statement = exprStmt | printStmt | ifStmt | whileStmt | block ;
 
 exprStmt  = expression ";" ;
 
 printStmt = "print" expression ";" ;
 
 ifStmt    = "if" "(" expression ")" statement ( "else" statement )? ;
+
+whileStmt = "while" "(" expression ")" statement ;
 
 block     = "{" declaration* } ;
 ```
@@ -398,7 +403,9 @@ print 6 * (2 + 1)   // output: 18
 
 ## Statements
 
-### Variable Declaration Statements
+### Declaration Statements
+
+#### Variable Declaration Statements
 
 Variables are declared through a user-defined unique identifier, which can be optionally initialised.
 
@@ -479,6 +486,28 @@ fn isWaterFreezing(tempCelsius) {
 
 isWaterFreezing(-10);   // output: true
 isWaterFreezing(10);    // output: false
+```
+
+### Iterative Statements
+
+Iterative statements repeatedly execute a statement or a block of statements.
+
+#### While Statement
+
+The `while` statement executes a statement or a block of statements when it's Boolean condition expression evaluates to
+`true`. The condition is evaluated before each iteration of the loop, meaning the body of the `while` loop can be
+executed zero or more times.
+
+```hob
+var i = 0;
+while (i < 3) {
+  print i;
+  i = i + 1;
+}
+// output:
+// 0
+// 1
+// 2
 ```
 
 ## Variables 

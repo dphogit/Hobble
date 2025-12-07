@@ -24,3 +24,5 @@ public sealed record IfStmt(Expr Condition, Stmt Then, Stmt? Else = null) : Stmt
 public sealed record PrintStmt(Expr Expr) : Stmt;
 
 public sealed record VarStmt(Token Identifier, Expr? Initializer = null) : Stmt;
+
+public sealed record WhileStmt(Expr Condition, Stmt Body) : Stmt;

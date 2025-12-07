@@ -340,5 +340,14 @@ public class TreeWalkInterpreterTests
         Assert.Throws<RuntimeError>(() => interpreter.Execute(stmt));
     }
 
+    [Fact]
+    public void Execute_WhileStmtNonBoolCondition_ThrowsRuntimeError()
+    {
+        var stmt = new WhileStmt(LiteralExpr.Number(1), new PrintStmt(LiteralExpr.Number(1)));
+        var interpreter = new TreeWalkInterpreter();
+        
+        Assert.Throws<RuntimeError>(() => interpreter.Execute(stmt));
+    }
+
     #endregion
 }

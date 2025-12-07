@@ -111,6 +111,9 @@ public class Parser
         if (Match(TokenType.If))
             return IfStmt();
 
+        if (Match(TokenType.While))
+            return WhileStmt();
+
         return ExprStmt();
     }
 
@@ -144,6 +147,17 @@ public class Parser
         var elseBranch = Match(TokenType.Else) ? Statement() : null;
         
         return new IfStmt(condition, thenBranch, elseBranch);
+    }
+
+    private WhileStmt WhileStmt()
+    {
+        Consume(TokenType.LeftParen, "Expect '(' after 'while'.");
+        var condition = Expression();
+        Consume(TokenType.RightParen, "Expect ')' after while condition.");
+        
+        var body = Statement();
+        
+        return new WhileStmt(condition, body);
     }
     
     private ExprStmt ExprStmt()
@@ -332,7 +346,7 @@ public class Parser
 
     /// <summary>
     /// Moves forward and discards tokens until next statement boundary. This gives a good user experience in trying to
-    /// give back as many errors as possible at once rather than one at a time, while also a best effort at preventing
+    /// give back as many errors as possible at once rather than one at a time, while also the best effort at preventing
     /// errors cascading into future separate errors.
     /// </summary>
     private void Synchronize()

@@ -29,6 +29,7 @@ public class ScannerTests
     [InlineData("print", TokenType.Print)]
     [InlineData("var", TokenType.Var)]
     [InlineData("if", TokenType.If)]
+    [InlineData("while", TokenType.While)]
     [InlineData("identifier", TokenType.Identifier)]
     [InlineData("", TokenType.Eof)]
     public void NextToken_NonValueTokenTypes_ReturnsToken(string lexeme, TokenType type)
