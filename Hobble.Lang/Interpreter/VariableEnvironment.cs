@@ -1,6 +1,4 @@
-﻿using Hobble.Lang.Representation;
-
-namespace Hobble.Lang.Interpreter;
+﻿namespace Hobble.Lang.Interpreter;
 
 public class VariableEnvironment(VariableEnvironment? parent = null)
 {

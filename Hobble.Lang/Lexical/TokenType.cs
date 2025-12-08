@@ -21,6 +21,7 @@ public enum TokenType
     AmpAmp,
     PipePipe,
     SemiColon,
+    Comma,
     
     String,
     Number,
@@ -34,6 +35,8 @@ public enum TokenType
     Else,
     While,
     For,
+    Function,
+    Return,
     
     Error,
     Eof,

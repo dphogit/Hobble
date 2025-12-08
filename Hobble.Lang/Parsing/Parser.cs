@@ -89,6 +89,9 @@ public class Parser
         if (Match(TokenType.Var))
             return VarDecl();
 
+        if (Match(TokenType.Function))
+            return FuncDecl();
+
         return Statement();
     }
 
@@ -98,6 +101,28 @@ public class Parser
         var initializer = Match(TokenType.Equal) ? Expression() : null;
         ConsumeEndOfStatementSemiColon();
         return new VarStmt(identifier, initializer);
+    }
+
+    private FnStmt FuncDecl()
+    {
+        var identifier = Consume(TokenType.Identifier, "Expected function name.");
+        
+        Consume(TokenType.LeftParen, "Expected '(' after function name.");
+
+        List<Token> parameters = [];
+        if (!Check(TokenType.RightParen))
+        {
+            do
+            {
+                var parameter = Consume(TokenType.Identifier, "Expected parameter name.");
+                parameters.Add(parameter);
+            } while (Match(TokenType.Comma));
+        }
+
+        Consume(TokenType.RightParen, "Expected ')' after function parameters.");
+        Consume(TokenType.LeftBrace, "Expect '{' at start of function body.");
+
+        return new FnStmt(identifier, parameters, Block());
     }
     
     private Stmt Statement()
@@ -116,6 +141,9 @@ public class Parser
 
         if (Match(TokenType.For))
             return ForStmt();
+
+        if (Match(TokenType.Return))
+            return ReturnStmt();
 
         return ExprStmt();
     }
@@ -206,6 +234,14 @@ public class Parser
         
         return ExprStmt();
     }
+
+    private ReturnStmt ReturnStmt()
+    {
+        var keyword = _prev;
+        var value = Check(TokenType.SemiColon) ? null : Expression();
+        ConsumeEndOfStatementSemiColon();
+        return new ReturnStmt(keyword, value);
+    }
     
     private ExprStmt ExprStmt()
     {
@@ -282,7 +318,13 @@ public class Parser
             return new UnaryExpr(op, right);
         }
 
-        return Primary();
+        return Call();
+    }
+
+    private Expr Call()
+    {
+        var expr = Primary();
+        return Match(TokenType.LeftParen) ? FinishCall(expr) : expr;
     }
 
     private Expr Primary()
@@ -324,6 +366,25 @@ public class Parser
         }
         
         return expr;
+    }
+
+    private CallExpr FinishCall(Expr callee)
+    {
+        IList<Expr> arguments = [];
+        
+        // If we immediately hit the closing parenthesis, then there are no arguments to the call.
+        if (!Check(TokenType.RightParen))
+        {
+            do
+            {
+                var argument = Expression();
+                arguments.Add(argument);
+            } while (Match(TokenType.Comma));
+        }
+
+        Consume(TokenType.RightParen, "Expected closing ')' after arguments.");
+        
+        return new CallExpr(callee, arguments);
     }
 
     #endregion

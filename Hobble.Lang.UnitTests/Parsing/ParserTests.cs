@@ -161,6 +161,18 @@ public class ParserTests
         Assert.Equal(expectedExpr, expr);
     }
 
+    [Fact]
+    public void ParseExpression_FunctionCall_ReturnsCallExpr()
+    {
+        var parser = new Parser();
+
+        var expr = parser.ParseExpression("printSum(1, 2)");
+
+        var callee = new VarExpr(_tokenFactory.Identifier("printSum"));
+        var expectedExpr = new CallExpr(callee, [LiteralExpr.Number(1), LiteralExpr.Number(2)]);
+        Assert.Equal(expectedExpr, expr);
+    }
+
     #endregion
     
     #region Statement Parsing
@@ -283,6 +295,31 @@ public class ParserTests
         var whileBody = new BlockStmt([new PrintStmt(iExpr), new ExprStmt(increment)]);
         var expectedStmt = new BlockStmt([initializer, new WhileStmt(condition, whileBody)]);
         
+        Assert.Equal(expectedStmt, stmt);
+    }
+
+    [Fact]
+    public void ParseStatement_FunctionDeclaration_ReturnsFnStmt()
+    {
+        var parser  = new Parser();
+
+        var stmt = parser.ParseStatement("fn printSum(a, b) { print a + b; }");
+
+        var a = _tokenFactory.Identifier("a");
+        var b = _tokenFactory.Identifier("b");
+        var printStmt = new PrintStmt(new BinaryExpr(new VarExpr(a), _tokenFactory.Plus(), new VarExpr(b)));
+        var expectedStmt = new FnStmt(_tokenFactory.Identifier("printSum"), [a, b], new BlockStmt([printStmt]));
+        Assert.Equal(expectedStmt, stmt);
+    }
+
+    [Fact]
+    public void ParseStatement_ReturnExpression_ReturnsReturnStmt()
+    {
+        var parser = new Parser();
+        
+        var stmt = parser.ParseStatement("return 67;");
+        
+        var expectedStmt = new ReturnStmt(_tokenFactory.Return(), LiteralExpr.Number(67));
         Assert.Equal(expectedStmt, stmt);
     }
     

@@ -1,7 +1,6 @@
 ﻿using Hobble.Lang.Interface;
 using Hobble.Lang.Lexical;
 using Hobble.Lang.Parsing;
-using Hobble.Lang.Representation;
 
 namespace Hobble.Lang.Interpreter;
 
@@ -39,11 +38,17 @@ public class TreeWalkInterpreter(IReporter reporter)
             case ExprStmt exprStmt:
                 Evaluate(exprStmt.Expr);
                 return;
+            case FnStmt fnStmt:
+                ExecuteFnStmt(fnStmt);
+                return;
             case IfStmt ifStmt:
                 ExecuteIfStmt(ifStmt);
                 return;
             case PrintStmt printStmt:
                 ExecutePrintStmt(printStmt);
+                return;
+            case ReturnStmt returnStmt:
+                ExecuteReturnStmt(returnStmt);
                 return;
             case VarStmt varStmt:
                 ExecuteVarStmt(varStmt);
@@ -75,6 +80,12 @@ public class TreeWalkInterpreter(IReporter reporter)
         }
     }
 
+    private void ExecuteFnStmt(FnStmt fnStmt)
+    {
+        var function = HobbleValue.Function(new HobbleFunction(fnStmt));
+        _environment.Define(fnStmt.Identifier.Lexeme, function);
+    }
+
     private void ExecuteIfStmt(IfStmt ifStmt)
     {
         CheckConditionIsBool(ifStmt.Condition, out var result);
@@ -89,6 +100,11 @@ public class TreeWalkInterpreter(IReporter reporter)
     {
         var result = Evaluate(printStmt.Expr);
         reporter.Output(result.ToString());
+    }
+
+    private void ExecuteReturnStmt(ReturnStmt returnStmt)
+    {
+        ReturnValue.Throw(returnStmt.Expr is null ? HobbleValue.Null() : Evaluate(returnStmt.Expr));
     }
 
     private void ExecuteVarStmt(VarStmt varStmt)
@@ -118,6 +134,7 @@ public class TreeWalkInterpreter(IReporter reporter)
         {
             AssignExpr assignExpr => EvaluateAssignExpr(assignExpr),
             BinaryExpr binaryExpr => EvaluateBinaryExpr(binaryExpr),
+            CallExpr callExpr => EvaluateCallExpr(callExpr),
             GroupExpr groupExpr => Evaluate(groupExpr.Expr),
             LiteralExpr literalExpr => literalExpr.Value,
             UnaryExpr unaryExpr => EvaluateUnaryExpr(unaryExpr),
@@ -247,6 +264,22 @@ public class TreeWalkInterpreter(IReporter reporter)
         }
     }
 
+    private HobbleValue EvaluateCallExpr(CallExpr callExpr)
+    {
+        var callee = Evaluate(callExpr.Callee);
+        var arguments = callExpr.Arguments.Select(Evaluate).ToList();
+
+        if (!callee.IsFunction())
+            throw new RuntimeError("Callee is not callable.");
+
+        var function = callee.AsFunction();
+
+        if (arguments.Count != function.Arity)
+            throw new RuntimeError($"Expected {function.Arity} arguments but got {arguments.Count}.");
+        
+        return function.Call(arguments, ExecuteBlockStmt, _environment);
+    }
+    
     private HobbleValue EvaluateUnaryExpr(UnaryExpr unaryExpr)
     {
         var op = unaryExpr.Operator;

@@ -10,6 +10,7 @@ idioms and how the language works.
     * [Syntax Grammar](#syntax-grammar)
       * [Declarations and Statements](#declarations-and-statements)
       * [Expressions](#expressions)
+      * [Utility Rules](#utility-rules)
     * [Lexical Grammar](#lexical-grammar)
       * [Comments](#comments)
   * [Operators and Expressions](#operators-and-expressions)
@@ -34,8 +35,7 @@ idioms and how the language works.
       * [Simple Assignment](#simple-assignment)
     * [Operator Precedence](#operator-precedence)
   * [Statements](#statements)
-    * [Declaration Statements](#declaration-statements)
-      * [Variable Declaration Statements](#variable-declaration-statements)
+    * [Variable Declaration Statements](#variable-declaration-statements)
     * [Expression Statements](#expression-statements)
     * [Print Statements](#print-statements)
     * [Selection Statements](#selection-statements)
@@ -45,6 +45,8 @@ idioms and how the language works.
       * [For Statement](#for-statement)
   * [Variables](#variables-)
     * [Local Variables and Lexical Scope](#local-variables-and-lexical-scope)
+  * [Functions](#functions)
+    * [Return Values](#return-values)
 <!-- TOC -->
 
 ## Types
@@ -83,7 +85,9 @@ program = declaration* EOF;
 Declaration statements introduce binding to identifiers.
 
 ```ebnf
-declaration = varDecl | statement ;
+declaration = varDecl | fnDecl | statement ;
+
+fnDecl      = "fn" IDENTIFIER "(" params? ")" block ;
 
 varDecl     = "var" IDENTIFIER ( "=" expression )? ";" ;
 ```
@@ -91,20 +95,22 @@ varDecl     = "var" IDENTIFIER ( "=" expression )? ";" ;
 The remaining statements which aren't declarations, produce side effects without creating bindings.
 
 ```ebnf
-statement = exprStmt | printStmt | ifStmt | whileStmt | block ;
+statement  = exprStmt | printStmt | ifStmt | whileStmt | forStmt | returnStmt | block ;
 
-exprStmt  = expression ";" ;
+exprStmt   = expression ";" ;
 
-printStmt = "print" expression ";" ;
+printStmt  = "print" expression ";" ;
 
-ifStmt    = "if" "(" expression ")" statement ( "else" statement )? ;
+ifStmt     = "if" "(" expression ")" statement ( "else" statement )? ;
 
-whileStmt = "while" "(" expression ")" statement ;
+whileStmt  = "while" "(" expression ")" statement ;
 
-forStmt   = "for" "(" ( varDecl | exprStmt | ";" )
-                      expression? ";"
-                      expression?
-                  ")" statement ;
+forStmt    =  "for" "(" ( varDecl | exprStmt | ";" )
+                        expression? ";"
+                        expression?
+                    ")" statement ;
+
+returnStmt = "return" expression? ";" ;
 
 block     = "{" declaration* } ;
 ```
@@ -133,11 +139,23 @@ additive       = multiplicative ( ( "+" | "-" ) multiplicative )* ;
 
 multiplicative = unary ( ( "*" | "/" ) unary )* ;
 
-unary          = ( ( "-" | "!" ) unary ) | primary ;
+unary          = ( ( "-" | "!" ) unary ) | call ;
+
+call           = primary ( "(" arguments? ")" )* ;
 
 primary        = NUMBER | STRING | grouping | IDENTIFIER | "false" | "true" ;
 
 grouping       = "(" expression ")" ;
+```
+
+#### Utility Rules
+
+Reusable production rules to keep the syntax grammar more readable and tidy.
+
+```ebnf
+params    = IDENTIFIER ( "," IDENTIFIER )* ;
+
+arguments = expression ( "," expression )* ;
 ```
 
 ### Lexical Grammar
@@ -390,6 +408,7 @@ the operators with lower precedence. The following table contains the operators 
 
 | Precedence | Operators                            | Name           |
 |:----------:|:-------------------------------------|----------------|
+|     1      | `x()`,                               | Call           |
 |     1      | `-x`, `!x`                           | Unary          |
 |     2      | `x * y`, `x / y`                     | Multiplicative |
 |     3      | `x + y`, `x - y`                     | Additive       |
@@ -409,9 +428,7 @@ print 6 * (2 + 1)   // output: 18
 
 ## Statements
 
-### Declaration Statements
-
-#### Variable Declaration Statements
+### Variable Declaration Statements
 
 Variables are declared through a user-defined unique identifier, which can be optionally initialised.
 
@@ -591,4 +608,43 @@ fn sayHello() {
 // Each call will have their own localised scope instantiation with each their own 'x' variable.
 sayHello(); // output: "Hello"
 sayHello(); // output: "Hello"
+```
+
+## Functions
+
+Functions allow for reusable blocks of code.
+
+The `fn` keyword is used to declare a function. The function requires a name, an optional comma-separated list of
+parameters and the body, which is a block containing the statements to be executed when the function is invoked/called.
+
+```hob
+// Declare the function
+fn printSum(a, b) {
+  print a + b;
+}
+
+// Call the function
+printSum(1, 2); // output: 3
+```
+
+### Return Values
+
+Functions can return a value to the caller using the `return` statement. The value followed by the `return` keyword will
+be returned to the caller, if the value is omitted or the `return` keyword is omitted from the function then it will
+implicitly return `null`.
+
+```hob
+fn sum(a, b) {
+  a + b;
+}
+
+var x = sum(1, 2);
+print x;  // output: "null"
+
+fn sum2(a, b) {
+  return a + b;
+}
+
+var y = sum(1, 2);
+print y;  // output: 3
 ```

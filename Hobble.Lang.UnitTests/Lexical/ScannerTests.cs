@@ -24,6 +24,7 @@ public class ScannerTests
     [InlineData("&&", TokenType.AmpAmp)]
     [InlineData("||", TokenType.PipePipe)]
     [InlineData(";", TokenType.SemiColon)]
+    [InlineData(",", TokenType.Comma)]
     [InlineData("false", TokenType.False)]
     [InlineData("true", TokenType.True)]
     [InlineData("print", TokenType.Print)]
@@ -31,6 +32,8 @@ public class ScannerTests
     [InlineData("if", TokenType.If)]
     [InlineData("while", TokenType.While)]
     [InlineData("for", TokenType.For)]
+    [InlineData("fn", TokenType.Function)]
+    [InlineData("return", TokenType.Return)]
     [InlineData("identifier", TokenType.Identifier)]
     [InlineData("", TokenType.Eof)]
     public void NextToken_NonValueTokenTypes_ReturnsToken(string lexeme, TokenType type)

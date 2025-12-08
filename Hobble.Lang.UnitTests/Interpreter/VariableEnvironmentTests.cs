@@ -1,5 +1,4 @@
 ﻿using Hobble.Lang.Interpreter;
-using Hobble.Lang.Representation;
 
 namespace Hobble.Lang.UnitTests.Interpreter;
 

@@ -54,6 +54,7 @@ public class Scanner(string source)
             '&' => Match('&') ? _tokenFactory.AmpAmp() : _tokenFactory.Error("Logical AND requires two ampersands."),
             '|' => Match('|') ? _tokenFactory.PipePipe() : _tokenFactory.Error("Logical OR requires two ampersands."),
             ';' => _tokenFactory.SemiColon(),
+            ',' => _tokenFactory.Comma(),
             '"' => String(),
             _ => _tokenFactory.Error($"Unexpected character '{c}'.")
         };

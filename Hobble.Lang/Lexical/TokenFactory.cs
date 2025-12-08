@@ -15,6 +15,10 @@ public class TokenFactory(int line = 1)
     public Token Var() => Create("var", TokenType.Var);
     public Token If() => Create("if", TokenType.If);
     public Token Else() => Create("else", TokenType.Else);
+    public Token While() => Create("while", TokenType.While);
+    public Token For() => Create("for", TokenType.For);
+    public Token Function() => Create("fn", TokenType.Function);
+    public Token Return() => Create("return", TokenType.Return);
 
     public Token Plus() => Create("+", TokenType.Plus);
     public Token Minus() => Create("-", TokenType.Minus);
@@ -35,6 +39,7 @@ public class TokenFactory(int line = 1)
     public Token AmpAmp() => Create("&&", TokenType.AmpAmp);
     public Token PipePipe() => Create("||", TokenType.PipePipe);
     public Token SemiColon() => Create(";", TokenType.SemiColon);
+    public Token Comma() => Create(",", TokenType.Comma);
     public Token Eof() => Create("", TokenType.Eof);
     public Token Error(string message) => Create(message, TokenType.Error);
 
@@ -66,11 +71,16 @@ public class TokenFactory(int line = 1)
             "&&" => AmpAmp(),
             "||" => PipePipe(),
             ";" => SemiColon(),
+            "," => Comma(),
             "false" => False(),
             "true" => True(),
             "var" => Var(),
             "if" => If(),
             "else" => Else(),
+            "while" => While(),
+            "for" => For(),
+            "fn" => Function(),
+            "return" => Return(),
             _ => throw new ArgumentException($"Unknown token to create from '{s}'")
         };
     }

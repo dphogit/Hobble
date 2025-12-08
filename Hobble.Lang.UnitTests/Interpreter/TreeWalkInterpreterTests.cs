@@ -2,7 +2,6 @@
 using Hobble.Lang.Interpreter;
 using Hobble.Lang.Lexical;
 using Hobble.Lang.Parsing;
-using Hobble.Lang.Representation;
 using NSubstitute;
 
 namespace Hobble.Lang.UnitTests.Interpreter;

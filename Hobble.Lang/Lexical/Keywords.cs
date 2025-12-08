@@ -14,13 +14,17 @@ public static class Keywords
         { "else", TokenType.Else },
         { "while", TokenType.While },
         { "for", TokenType.For },
+        { "fn", TokenType.Function },
+        { "return", TokenType.Return }
     };
 
     private static readonly HashSet<TokenType> StatementStarters =
     [
         TokenType.For,
+        TokenType.Function,
         TokenType.If,
         TokenType.Print,
+        TokenType.Return,
         TokenType.While,
         TokenType.Var
     ];

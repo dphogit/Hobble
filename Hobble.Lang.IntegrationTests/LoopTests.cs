@@ -19,7 +19,7 @@ public class LoopTests : BaseIntegrationTests
                               print sum;    // expect: 3
                               """;
 
-        ReporterActionTest(source, reporter => reporter.Received(1).Output("3"));
+        ReporterTest(source, reporter => reporter.Received(1).Output("3"));
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public class LoopTests : BaseIntegrationTests
                               print sum;    // expect: 3
                               """;
         
-        ReporterActionTest(source, reporter => reporter.Received(1).Output("3"));
+        ReporterTest(source, reporter => reporter.Received(1).Output("3"));
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public class LoopTests : BaseIntegrationTests
                               print sum;    // expect: 3
                               """;
         
-        ReporterActionTest(source, reporter => reporter.Received(1).Output("3"));
+        ReporterTest(source, reporter => reporter.Received(1).Output("3"));
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public class LoopTests : BaseIntegrationTests
                               print sum;    // expect: 3
                               """;
         
-        ReporterActionTest(source, reporter => reporter.Received(1).Output("3"));
+        ReporterTest(source, reporter => reporter.Received(1).Output("3"));
     }
 
     [Fact]
@@ -85,6 +85,6 @@ public class LoopTests : BaseIntegrationTests
                               print sum;    // expect: 3
                               """;
         
-        ReporterActionTest(source, reporter => reporter.Received(1).Output("3"));
+        ReporterTest(source, reporter => reporter.Received(1).Output("3"));
     }
 }
