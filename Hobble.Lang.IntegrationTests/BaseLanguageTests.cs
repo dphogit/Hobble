@@ -3,7 +3,7 @@ using NSubstitute;
 
 namespace Hobble.Lang.IntegrationTests;
 
-public abstract class BaseIntegrationTests
+public abstract class BaseLanguageTests
 {
     protected static void ReporterTest(string source, Action<IReporter>? reporterAction = null)
     {

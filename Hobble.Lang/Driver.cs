@@ -25,8 +25,29 @@ public class Driver(IReporter reporter)
         return !_interpreter.HadRuntimeError;
     }
 
-    public void RunFile(string file)
+    public bool RunFile(string filePath)
     {
-        throw new NotImplementedException("File running not implemented yet.");
+        if (!File.Exists(filePath))
+        {
+            reporter.Error($"File '{filePath}' not found.");
+            return false;
+        }
+
+        if (Path.GetExtension(filePath) != ".hob")
+        {
+            reporter.Error("Not a .hob file.");
+            return false;
+        }
+
+        try
+        {
+            var source = File.ReadAllText(filePath);
+            return Run(source);
+        }
+        catch (Exception e)
+        {
+            reporter.Error($"Failed to read file: {e.Message}");
+            return false;
+        }
     }
 }

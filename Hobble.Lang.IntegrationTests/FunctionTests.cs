@@ -2,7 +2,7 @@
 
 namespace Hobble.Lang.IntegrationTests;
 
-public class FunctionTests : BaseIntegrationTests
+public class FunctionTests : BaseLanguageTests
 {
     [Fact]
     public void Call()

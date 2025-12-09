@@ -2,7 +2,7 @@
 
 namespace Hobble.Lang.IntegrationTests;
 
-public class LoopTests : BaseIntegrationTests
+public class LoopTests : BaseLanguageTests
 {
     [Fact]
     public void While()
